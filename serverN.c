@@ -1,13 +1,3 @@
-/**
- * Semplice programma che invia ai client il Daytime del server.
- *
- * Il programma è abilitato alla gestione di più richieste in parallelo,
- * mediante la tecnica della programmazione concorrente. Il processo genitore
- * si occupa della gestione delle richieste (socket di richieste), mentre i
- * processi figli si occupano del completamento delle richieste (socket accettati).
- * @author Dario Musella
- */
-
 #include "wrapper.c"
 #include <time.h>
 #include <string.h>
