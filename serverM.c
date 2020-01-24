@@ -5,7 +5,6 @@
 #include "pct_n.c"
 #include <time.h>
 #include <string.h>
-#define BUFSIZE 2048
 
 int main(int argc, char **argv) {
 	/* VARIABILI SERVER */
@@ -82,86 +81,110 @@ int main(int argc, char **argv) {
 		if (!(pid = Fork())) { /* child */
 			close(listenfd);
 
-			Read(connfd, buf, sizeof(buf)); /* identificazione server */
-			if (strncmp(buf, "N", 1)) {
+			Read(connfd, buf, 1); /* identificazione server */
+			if (!strncmp(buf, "N", 1)) {
 				/* connessione con serverN */
-				fputs("Connessione con serverN.\n", stderr);
 				Write(connfd, "0", 1);
-				Read(connfd, &req_n, sizeof(req_n));
-				switch (req_n.rich) {
-					case '1':
-						/* crea un nuovo negozio virtuale */
-						u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-						u_tmp -> negozi = inserisciNegozio(u_tmp -> negozi, req_n.query.q_neg);
-						if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL)
-							Write(connfd, "0", 1);	/* operazione effettuata correttamente */
-						else
-							Write(connfd, "1", 1);	/* errore */
-						break;
-					case '2':
-						/* Elimina un negozio virtuale */
-						u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-						u_tmp -> negozi = eliminaNegozio(u_tmp -> negozi, req_n.query.q_neg);
-						if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL)
-							Write(connfd, "0", 1);	/* operazione effettuata correttamente */
-						else
-							Write(connfd, "1", 1);	/* errore */
-						break;
-					case '3':
-						/* Aggiungi un prodotto in un negozio virtuale */
-						u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-						n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg);
-						n_tmp -> prodotti = inserisciProdotto(n_tmp -> prodotti, req_n.query.q_prod);
-						if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) != NULL)
-							Write(connfd, "0", 1);	/* operazione effettuata correttamente */
-						else
-							Write(connfd, "1", 1);	/* errore */
-						break;
-					case '4':
-						/* Rimuovi un prodotto in un negozio virtuale */
-						u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-						n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg);
-						n_tmp -> prodotti = eliminaProdotto(n_tmp -> prodotti, req_n.query.q_prod);
-						if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) == NULL)
-							Write(connfd, "0", 1);	/* operazione effettuata correttamente */
-						else
-							Write(connfd, "1", 1);	/* errore */
-						break;
-					case '5':
-						Write(connfd, "0", 1);	/* ok, letta richiesta di login, leggere le credenziali */
-						Read(connfd, &login, sizeof(login));
-						if ((u_tmp = ricercaUtente(listaUtenti, login.user)) == NULL)
-							Write(connfd, "1", 1); /* utente non valido */
-						else {
-							if (!strcmp(u_tmp -> password, login.pass))
-								Write(connfd, "0", 1);
+				fputs("Connessione con serverN.\n", stderr);
+				while (1) {
+					if (Read(connfd, &req_n, sizeof(req_n)) != 0) {
+						fputs("Connessione persa con serverN.\n", stderr);
+						exit(1);
+					}
+					switch (req_n.rich) {
+						case '1':
+							/* crea un nuovo negozio virtuale */
+							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL)  /* assicura che il negozio non esista */
+								u_tmp -> negozi = inserisciNegozio(u_tmp -> negozi, req_n.query.q_neg);
 							else
-								Write(connfd, "2", 1); /* password non valida */
-						}
-						break;
-					default:
-						fputs("Richiesta non valida.\n", stderr);
-						break;
+								Write(connfd, "1", 1);	/* errore: negozio già esistente */
+							
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
+								fputs("Inserito nuovo negozio, ecco la lista attuale:\n", stdout);
+								visualizzaDati(listaUtenti);
+								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+							}
+							else
+								Write(connfd, "1", 1);	/* errore */
+							break;
+						case '2':
+							/* Elimina un negozio virtuale */
+							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL)  /* assicura che il negozio non esista */
+								u_tmp -> negozi = eliminaNegozio(u_tmp -> negozi, req_n.query.q_neg);
+							else
+								Write(connfd, "1", 1); /* errore: negozio inesistente */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL)
+								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+							else
+								Write(connfd, "1", 1);	/* errore */
+							break;
+						case '3':
+							/* Aggiungi un prodotto in un negozio virtuale */
+							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
+								if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) == NULL)
+									n_tmp -> prodotti = inserisciProdotto(n_tmp -> prodotti, req_n.query.q_prod);
+								else
+									Write(connfd, "1", 1);	/* prodotto già esistente in quel negozio */
+							}
+							else
+								Write(connfd, "1", 1);	/* negozio inesistente */
+							if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) != NULL)
+								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+							else
+								Write(connfd, "1", 1);	/* errore */
+							visualizzaDati(listaUtenti);
+							break;
+						case '4':
+							/* Rimuovi un prodotto in un negozio virtuale */
+							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
+								if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) != NULL)
+									n_tmp -> prodotti = eliminaProdotto(n_tmp -> prodotti, req_n.query.q_prod);
+								else
+									Write(connfd, "1", 1); /* prodotto inesistente */
+							}
+							else
+								Write(connfd, "1", 1); /* negozio inesistente */
+							if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) == NULL)
+								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+							else
+								Write(connfd, "1", 1);	/* errore */
+							visualizzaDati(listaUtenti);
+							break;
+						case '5':
+							Write(connfd, "0", 1);	/* ok, letta richiesta di login, leggere le credenziali */
+							Read(connfd, &login, sizeof(login));
+							if ((u_tmp = ricercaUtente(listaUtenti, login.user)) == NULL)
+								Write(connfd, "1", 1); /* utente non valido */
+							else {
+								if (!strcmp(u_tmp -> password, login.pass))
+									Write(connfd, "0", 1);
+								else
+									Write(connfd, "2", 1); /* password non valida */
+							}
+							break;
+						default:
+							fputs("Richiesta non valida.\n", stderr);
+							break;
+					}
 				}
 			}
 			else {
-				if (strncmp(buf, "C", 1)) {
+				if (!strncmp(buf, "C", 1)) {
 					/* connessione con serverC */
+					Write(connfd, "0", 1);
 					fputs("Connessione con serverC.\n", stderr);
-
+					Read(connfd, &req_n, sizeof(req_n));
 				}
 				else {
 					/* richiesta sconosciuta */
+					Write(connfd, "0", 1);
 					fputs("Richiesta non riconosciuta. Connessione chiusa.\n", stderr);
 					close(connfd);
 				}
-			}
-			Write(connfd, buff, sizeof(buff));
-
-			if (verbose) {
-				/* effettua il log dei client che richiedono */
-				inet_ntop(AF_INET, &cliaddr.sin_addr, buff, sizeof(buff));
-				fprintf(stdout, "Request from host %s, port %d\n", buff, ntohs(cliaddr.sin_port));
 			}
 			exit(0);
 		}
