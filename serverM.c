@@ -177,7 +177,68 @@ int main(int argc, char **argv) {
 					/* connessione con serverC */
 					Write(connfd, "0", 1);
 					fputs("Connessione con serverC.\n", stderr);
-					Read(connfd, &req_n, sizeof(req_n));
+					while (1) {
+						if (Read(connfd, &req_c, sizeof(req_c)) != 0) {
+							fputs("Connessione persa con serverC.\n", stderr);
+							exit(1);
+						}
+						switch(req_c.rich) {
+							case '1':
+								fputs("Ricevuta richiesta 1 da serverC\n", stdout);
+								u_tmp = listaUtenti;
+								while (u_tmp != NULL) {
+									n_tmp = u_tmp -> negozi;
+									while (n_tmp != NULL) {
+										sprintf(buf, "%s di %s", n_tmp -> nome_negozio, u_tmp -> username);
+										Write(connfd, buf, sizeof(buf));
+										n_tmp = n_tmp -> next;
+									}
+									u_tmp = u_tmp -> next;
+								}
+								Write(connfd, "0", sizeof(buf));
+								break;
+								
+							case '2':
+								fputs("Ricevuta richiesta 2 da serverC\n", stdout);
+								if((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop))!=NULL){
+									n_tmp = u_tmp -> negozi;
+									if ((n_tmp=ricercaNegozio(u_tmp->negozi, req_c.query.q_neg))!=NULL){
+										p_tmp=n_tmp->prodotti;
+										while (p_tmp != NULL) {
+											sprintf(buf, "%s ", p_tmp -> nome_prodotto);
+											Write(connfd, buf, sizeof(buf));
+											p_tmp = p_tmp -> next;
+										}
+										Write(connfd, "0", sizeof(buf));
+									}
+									else
+										//negozio non trovato//
+										Write(connfd, "1", sizeof(buf));
+								}
+								else
+									//utente non trovato//
+									Write(connfd, "1", sizeof(buf));
+
+								break;
+								
+							case '3':
+								fputs("Ricevuta richiesta 3 da serverC\n" , stdout);
+								if((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop))!=NULL){ //if non esiste chiudi con cod.1
+									n_tmp = u_tmp -> negozi; 
+									if((n_tmp=ricercaNegozio(u_tmp->negozi, req_c.query.q_neg))!=NULL) //if non esiste chiudi con cod.1
+										p_tmp=n_tmp->prodotti;
+									else
+										Write(connfd, "1", sizeof(buf));
+									if((p_tmp=ricercaProdotto(p_tmp, req_c.query.q_prod))!=NULL)//if esiste chiudi con cod 0 else chiudi con cod.1
+										Write(connfd, "0", sizeof(buf)); 
+									else
+										Write(connfd, "1", sizeof(buf));
+								}
+								else 
+									Write(connfd, "1", sizeof(buf));
+								break;
+						}
+					}
 				}
 				else {
 					/* richiesta sconosciuta */

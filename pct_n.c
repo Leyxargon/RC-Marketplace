@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-typedef struct QUERY {
+typedef struct QUERY_N {
 	char q_neg[50];
 	char q_prod[50];
 }query_n;
@@ -25,8 +25,3 @@ typedef struct LOGIN_N {
 }login_n;
 
 /* pacchetto di richiesta login */
-
-void elabRich_n(pct_n pacch, int sfd) {
-	login_n login;
-
-}

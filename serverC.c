@@ -1,7 +1,7 @@
 #include "liste/lista.h"
 #include "wrapper.h"
 #include "liste/iofile.h"
-#include "pct_n.c"
+#include "pct_c.c"
 #include <time.h>
 #include <string.h>
 
@@ -36,9 +36,7 @@ int main(int argc, char **argv) {
 	Negozio *n_tmp = NULL;
 	Prodotto *p_tmp = NULL;
 	char buf[BUFSIZE];
-	pct_n req_n;
-	login_n login;
-
+	pct_c req_c;
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
@@ -54,9 +52,9 @@ int main(int argc, char **argv) {
 
 	/* connessione al server */
 	Connect(sockfd, &c_servaddr);
-
+	
 	fputs("Connessione al serverM\n", stdout);
-	Write(sockfd, "N", 1);	/* identificazione al server */
+	Write(sockfd, "C", 1);	/* identificazione al server */
 	Read(sockfd, buf, 1);	/* leggi esito connessione */
 	if (!strncmp(buf, "0", 1))
 		printf("Connesso al serverM\n");
@@ -65,51 +63,57 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
-	pct_n richiesta;
-	richiesta.rich = '4';
-	strcpy(richiesta.user, "Ciro");
+	pct_c richiesta;
+	/*richiesta.rich = '1';
 	strcpy(richiesta.query.q_neg, "Dodeca'");
-	strcpy(richiesta.query.q_prod, "Frittata");
 	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
-	}
-	else
-		fputs("Operazione fallita.\n", stdout);
+	do {
+		Read(sockfd, buf, sizeof(buf));
+		if (buf[0] != '0')
+			fprintf(stdout, "%s\n", buf);
+	} while (buf[0] != '0');*/
 	
-	richiesta.rich = '1';
-	strcpy(richiesta.user, "Ciro");
-	strcpy(richiesta.query.q_neg, "Patatineria");
+	/*richiesta.rich = '2';
+	strcpy(richiesta.query.q_neg, "Dodeca'");
+	strcpy(richiesta.query.q_prop, "Amadeus");
 	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
-	}
-	else
-		fputs("Operazione fallita.\n", stdout);
+	do {
+		Read(sockfd, buf, sizeof(buf));
+		if (buf[0] != '0' && buf[0]!='1')
+			fprintf(stdout, "%s\n", buf);
+	} while (buf[0] != '0' && buf[0]!='1');
+	if(buf[0]=='1'){
+		fputs("Nessun Risultato\n", stderr);
+	
+	}*/
 	
 	richiesta.rich = '3';
-	strcpy(richiesta.user, "Ciro");
-	strcpy(richiesta.query.q_neg, "Patatineria");
-	strcpy(richiesta.query.q_prod, "Patatine buone buone");
+	strcpy(richiesta.query.q_neg, "Dodeca'");
+	strcpy(richiesta.query.q_prop, "Ciro");
+	strcpy(richiesta.query.q_prod, "Uova");
 	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
+	do {
+		Read(sockfd, buf, sizeof(buf));
+		if (buf[0] != '0' && buf[0]!='1')
+			fprintf(stdout, "%s\n", buf);
+	} while (buf[0] != '0' && buf[0]!='1');
+	if(buf[0]=='1')
+		fputs("Nessun Risultato\n", stderr);
+	else {
+		if(buf[0]=='0'){
+		fputs("Prodotto trovato nel negozio\n", stderr);
+		}
 	}
-	else
-		fputs("Operazione fallita.\n", stdout);
 	
-	// close(sockfd);
-
-	/* SERVER verso clientN */
+	close(sockfd);
+	
+	/* SERVER verso client */
 	/* creazione socket */
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 	/* indirizzo del server */
 	s_servaddr.sin_family = AF_INET;
 	s_servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	s_servaddr.sin_port = htons(8001);
+	s_servaddr.sin_port = htons(8002);
 
 	fprintf(stdout, "IP address is: %s\n", inet_ntoa(s_servaddr.sin_addr));
 	fprintf(stdout, "port is: %d\n", (int) ntohs(s_servaddr.sin_port));
@@ -136,4 +140,5 @@ int main(int argc, char **argv) {
 			close(connfd);
 	}
 	exit(0);
+	
 }
