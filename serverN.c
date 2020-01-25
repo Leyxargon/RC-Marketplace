@@ -12,21 +12,25 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	pct_n richiesta;
 	/* VARIABILI SERVER verso clientN */
-	int listenfd, connfd;
+	int listenfd, connfd, sockfd;
 	/* 	listenfd: descrittore di ascolto
 	 *	connfd: descrittore di connessione
+	 *	sockfd: descrittore di servizio
 	 */
-	int len, pid;
+	int len;
 	struct sockaddr_in s_servaddr, s_cliaddr;
-	/* 	servaddr: informazioni indirizzo server
-	 *	cliaddr: informazioni indirizzo client connesso
+	/* 	s_servaddr: informazioni indirizzo server
+	 *	s_cliaddr: informazioni indirizzo client connesso
 	 */
+	int option = 1, i, maxi = -1, maxd, ready, client[FD_SETSIZE];
+	fd_set active_fd_set, read_fd_set;	/* insiemi di descrittori */
 
 	/* VARIABILI CLIENT verso serverM */
 	struct sockaddr_in c_servaddr;
 	struct hostent *c_cliaddr;
-	int sockfd;
+	int masterfd;
 
 	char **alias;
 	char *addr;
@@ -42,7 +46,7 @@ int main(int argc, char **argv) {
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
-	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
+	masterfd = Socket(AF_INET, SOCK_STREAM, 0);
 	c_servaddr.sin_family = AF_INET;
 	c_servaddr.sin_port = htons(8000);
 
@@ -53,11 +57,11 @@ int main(int argc, char **argv) {
 	Inet_pton(AF_INET, addr, &c_servaddr.sin_addr);
 
 	/* connessione al server */
-	Connect(sockfd, &c_servaddr);
+	Connect(masterfd, &c_servaddr);
 
 	fputs("Connessione al serverM\n", stdout);
-	Write(sockfd, "N", 1);	/* identificazione al server */
-	Read(sockfd, buf, 1);	/* leggi esito connessione */
+	Write(masterfd, "N", 1);	/* identificazione al server */
+	Read(masterfd, buf, 1);	/* leggi esito connessione */
 	if (!strncmp(buf, "0", 1))
 		printf("Connesso al serverM\n");
 	else {
@@ -65,13 +69,30 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
-	pct_n richiesta;
+	/*
+	pct_n richiesta;	
+	richiesta.rich = '5';
+	Write(masterfd, &richiesta, sizeof(richiesta));
+	strcpy(login.user, "Roberta");
+	strcpy(login.pass, "frigorifero69");
+	Write(masterfd, &login, sizeof(login));
+	Read(masterfd, buf, 1);
+	if (buf[0] == '0')
+		fputs("Autenticato\n", stdout);
+	else {
+		if (buf[0] == '1')
+			fputs("Utente non valido.\n", stderr);
+		else
+			if (buf[0] == '2')
+				fputs("Password errata.\n", stderr);
+	}
+	
 	richiesta.rich = '4';
 	strcpy(richiesta.user, "Ciro");
 	strcpy(richiesta.query.q_neg, "Dodeca'");
 	strcpy(richiesta.query.q_prod, "Frittata");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
+	Write(masterfd, &richiesta, sizeof(richiesta));
+	Read(masterfd, buf, 1);
 	if (buf[0] == '0') {
 		fputs("Operazione effettuata con successo.\n", stdout);
 	}
@@ -81,8 +102,8 @@ int main(int argc, char **argv) {
 	richiesta.rich = '1';
 	strcpy(richiesta.user, "Ciro");
 	strcpy(richiesta.query.q_neg, "Patatineria");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
+	Write(masterfd, &richiesta, sizeof(richiesta));
+	Read(masterfd, buf, 1);
 	if (buf[0] == '0') {
 		fputs("Operazione effettuata con successo.\n", stdout);
 	}
@@ -93,47 +114,105 @@ int main(int argc, char **argv) {
 	strcpy(richiesta.user, "Ciro");
 	strcpy(richiesta.query.q_neg, "Patatineria");
 	strcpy(richiesta.query.q_prod, "Patatine buone buone");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	Read(sockfd, buf, 1);
+	Write(masterfd, &richiesta, sizeof(richiesta));
+	Read(masterfd, buf, 1);
 	if (buf[0] == '0') {
 		fputs("Operazione effettuata con successo.\n", stdout);
 	}
 	else
 		fputs("Operazione fallita.\n", stdout);
 	
-	// close(sockfd);
-
+	close(masterfd);
+	*/
+	
 	/* SERVER verso clientN */
 	/* creazione socket */
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
+	
+	/* impostazioni socket */
+	SetSockOpt(listenfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 	/* indirizzo del server */
 	s_servaddr.sin_family = AF_INET;
 	s_servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	s_servaddr.sin_port = htons(8001);
-
-	fprintf(stdout, "IP address is: %s\n", inet_ntoa(s_servaddr.sin_addr));
-	fprintf(stdout, "port is: %d\n", (int) ntohs(s_servaddr.sin_port));
-
+	
+	fprintf(stdout, "Indirizzo IP: %s\n", inet_ntoa(s_servaddr.sin_addr));
+	fprintf(stdout, "Porta: %d\n", (int) ntohs(s_servaddr.sin_port));
+	
 	/* assegnazione indirizzo */
 	Bind(listenfd, &s_servaddr);
 	/* messa in ascolto */
 	Listen(listenfd, 1024);
-
+	
+	maxd = listenfd; /* maxd è il valore massimo dei descrittori in uso */
+	
+	/* il vettore client contiene i descrittori dei socket connessi */
+	for (i = 0; i < FD_SETSIZE; i++)
+		client[i] = -1; /* inizializza il vettore di client */
+	
+	FD_ZERO(&active_fd_set); /* inizializza a zero l'insieme dei descrittori */
+	FD_SET(listenfd, &active_fd_set); /* aggiunge il descrittore di ascolto */
+	FD_SET(masterfd, &active_fd_set);
+	
 	/* esecuzione server */
-	while(1) {
-		/* accettazione nuova richiesta */
-		len = sizeof(s_cliaddr);
-		connfd = Accept(listenfd, &s_cliaddr, &len);
-
-		/* fork per la gestione della connessione */
-		if (!(pid = Fork())) { /* child */
-			close(listenfd);
-
-
-			exit(0);
+	while (1) {
+		read_fd_set = active_fd_set; /* imposta il set di descrittori per la lettura */
+		ready = Select(maxd + 1, &read_fd_set, NULL, NULL, NULL);
+		
+		/* Se è arrivata una richiesta di connessione, il socket di ascolto
+		è leggibile: viene invocata accept() e creato un socket di connessione */
+		if (FD_ISSET(listenfd, &read_fd_set)) {
+			/* accettazione richiesta di connessione */
+			connfd = Accept(listenfd, &s_cliaddr, &len);
+			for (i = 0; i < FD_SETSIZE; i++)
+				if (client[i] < 0) {
+					client[i] = connfd;
+					break;
+				}
+			/* errore se non ci sono posti liberi nel vettore client */
+			if (i == FD_SETSIZE) {
+				fputs("accept: client array size full\n", stderr);
+				exit(1);
+			}
+			fputs("Client connesso.\n", stdout);
+			/* inserisce connfd tra i descrittori da controllare ed aggiorna maxd */
+			FD_SET(connfd, &active_fd_set);
+			if (connfd > maxd)
+				maxd = connfd;
+			if (i > maxi)
+				maxi = i;
+			--ready; /* richiesta accettata/rifiutata, un socket in meno */
 		}
-		else /* parent */
-			close(connfd);
+		
+		/* controlla i socket attivi per controllare se sono leggibili */
+		for (i = 0; i <= maxi && ready > 0; i++) {
+			if ((sockfd = client[i]) >= 0) { /* se il descrittore non è stato selezionato, viene saltato */
+				if (FD_ISSET(sockfd, &read_fd_set)) {
+					/* leggi da sockfd */
+					if (Read(sockfd, &richiesta, sizeof(richiesta)) == 0) {
+						Write(masterfd, &richiesta, sizeof(richiesta));
+						Read(masterfd, buf, 1);
+						if (buf[0] == '0') {
+							fputs("Operazione effettuata con successo.\n", stdout);
+							Write(sockfd, "0", 1);
+						}
+						else {
+							fputs("Operazione fallita.\n", stdout);
+							Write(sockfd, "1", 1);
+						}
+					}
+					else {
+						/* chiusura connessione da parte del client */
+						fputs("Connessione chiusa da client.\n", stdout);
+						FD_CLR(sockfd, &active_fd_set); /* rimuove sockfd dalla lista dei socket da controllare */
+						client[i] = -1; /* cancella sockfd da client */
+					}
+					--ready; /* richiesta elaborata o connessione chiusa, un socket in meno */
+				}
+			}
+		}
 	}
+	exit(0);
+	
 	exit(0);
 }

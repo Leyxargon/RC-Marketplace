@@ -12,14 +12,13 @@ int main(int argc, char **argv) {
 	/* 	listenfd: descrittore di ascolto
 	 *	connfd: descrittore di connessione
 	 */
-	int len, pid, verbose = 0;
+	int len, pid;
 	struct sockaddr_in servaddr, cliaddr;
 	/* 	servaddr: informazioni indirizzo server
 	 *	cliaddr: informazioni indirizzo client connesso
 	 */
 
 	/* VARIABILI LIVELLO APPLICAZIONE */
-	char buff[BUFSIZE];
 	char buf[BUFSIZE];
 	pct_c req_c;
 	pct_n req_n;
@@ -29,22 +28,9 @@ int main(int argc, char **argv) {
 	Utente *u_tmp = NULL;
 	Negozio *n_tmp = NULL;
 	Prodotto *p_tmp = NULL;
-
-	/* gestione errore */
-	if (argc > 1) {
-		if (strcmp(argv[1], "-v") && strcmp(argv[1], "--verbose")) {
-			fprintf(stderr,"Usage: %s [flag]\n\n  -v, --verbose\t\tverbose mode showing 'IP:port' client connections\n",argv[0]);
-			exit(1);
-		}
-		else
-			verbose++; /* flag per la modalità verbosa */
-	}
+	
 	/* LETTURA INFORMAZIONI */
-
-	if ((dbf = fopen("db.txt", "r+")) == NULL) {
-		perror("fopen");
-		exit(1);
-	}
+	dbf = Fopen("db.txt", "r+");
 	fputs("Caricamento dati in corso...\n", stdout);
 	if ((listaUtenti = importaDati(dbf)) == NULL) {
 		fputs("Errore nel caricamento dei dati.\n", stderr);
@@ -63,13 +49,13 @@ int main(int argc, char **argv) {
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(8000);
 
-	fprintf(stdout, "IP address is: %s\n", inet_ntoa(servaddr.sin_addr));
-	fprintf(stdout, "port is: %d\n", (int) ntohs(servaddr.sin_port));
+	fprintf(stdout, "Indirizzo IP: %s\n", inet_ntoa(servaddr.sin_addr));
+	fprintf(stdout, "Porta: %d\n", (int) ntohs(servaddr.sin_port));
 
 	/* assegnazione indirizzo */
 	Bind(listenfd, &servaddr);
 	/* messa in ascolto */
-	Listen(listenfd, 1024);
+	Listen(listenfd, 2);
 
 	/* esecuzione server */
 	while(1) {
@@ -155,15 +141,22 @@ int main(int argc, char **argv) {
 							visualizzaDati(listaUtenti);
 							break;
 						case '5':
-							Write(connfd, "0", 1);	/* ok, letta richiesta di login, leggere le credenziali */
+							fputs("Attendo richiesta di login.\n", stdout);
 							Read(connfd, &login, sizeof(login));
-							if ((u_tmp = ricercaUtente(listaUtenti, login.user)) == NULL)
+							fprintf(stdout, "Lette le credenziali %s : %s\n", login.user, login.pass);
+							if ((u_tmp = ricercaUtente(listaUtenti, login.user)) == NULL) {
+								fputs("Utente non valido.\n", stderr);
 								Write(connfd, "1", 1); /* utente non valido */
+							}
 							else {
-								if (!strcmp(u_tmp -> password, login.pass))
+								if (!strcmp(u_tmp -> password, login.pass)) {
+									fputs("Autenticazione confermata.\n", stdout);
 									Write(connfd, "0", 1);
-								else
+								}
+								else {
+									fputs("Password non valida.\n", stderr);
 									Write(connfd, "2", 1); /* password non valida */
+								}
 							}
 							break;
 						default:
@@ -200,41 +193,39 @@ int main(int argc, char **argv) {
 								
 							case '2':
 								fputs("Ricevuta richiesta 2 da serverC\n", stdout);
-								if((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop))!=NULL){
+								if ((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop)) != NULL) {
 									n_tmp = u_tmp -> negozi;
-									if ((n_tmp=ricercaNegozio(u_tmp->negozi, req_c.query.q_neg))!=NULL){
-										p_tmp=n_tmp->prodotti;
+									if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL) {
+										p_tmp = n_tmp -> prodotti;
 										while (p_tmp != NULL) {
-											sprintf(buf, "%s ", p_tmp -> nome_prodotto);
+											sprintf(buf, "%s", p_tmp -> nome_prodotto);
 											Write(connfd, buf, sizeof(buf));
 											p_tmp = p_tmp -> next;
 										}
 										Write(connfd, "0", sizeof(buf));
 									}
 									else
-										//negozio non trovato//
-										Write(connfd, "1", sizeof(buf));
+										Write(connfd, "1", sizeof(buf)); /* negozio non trovato */
 								}
 								else
-									//utente non trovato//
-									Write(connfd, "1", sizeof(buf));
+									Write(connfd, "1", sizeof(buf)); /* utente non trovato */
 
 								break;
 								
 							case '3':
 								fputs("Ricevuta richiesta 3 da serverC\n" , stdout);
-								if((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop))!=NULL){ //if non esiste chiudi con cod.1
+								if ((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop)) != NULL) {
 									n_tmp = u_tmp -> negozi; 
-									if((n_tmp=ricercaNegozio(u_tmp->negozi, req_c.query.q_neg))!=NULL) //if non esiste chiudi con cod.1
-										p_tmp=n_tmp->prodotti;
+									if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL)
+										p_tmp=n_tmp -> prodotti;
 									else
 										Write(connfd, "1", sizeof(buf));
-									if((p_tmp=ricercaProdotto(p_tmp, req_c.query.q_prod))!=NULL)//if esiste chiudi con cod 0 else chiudi con cod.1
+									if ((p_tmp = ricercaProdotto(p_tmp, req_c.query.q_prod)) != NULL)
 										Write(connfd, "0", sizeof(buf)); 
 									else
 										Write(connfd, "1", sizeof(buf));
 								}
-								else 
+								else
 									Write(connfd, "1", sizeof(buf));
 								break;
 						}
