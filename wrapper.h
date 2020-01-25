@@ -92,6 +92,23 @@ void GetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t *opt
 void SetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t optlen);
 
 /******************************************************
+ **                 I/O MULTIPLEXING                 **
+ ******************************************************/
+
+/**	Comunica al kernel di monitorare un insieme di descrittori, ponendo
+ *	il processo in waiting e risvegliandolo quando si verifica un evento.
+ *	@param maxfdp		Numero di descrittori da monitorare
+ *	@param readfds		Insieme di descrittori pronti per la lettura
+ *	@param writefds		Insieme di descrittori pronti per la scrittura
+ *	@param exceptfds	Insieme di descrittori pronti per la gestione di dati urgenti
+ *	@param timeout		Tempo massimo di attesa per un descrittore pronto
+ *						(se 0 si adotta il polling; se NULL il tempo di attesa è infinito)
+ *	@return	Numero di descrittori disponibili
+ */
+
+int Select(int maxfdp, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
+/******************************************************
  **       FUNZIONI E PROCEDURE DI USO GENERICO       **
  ******************************************************/
  
@@ -119,5 +136,11 @@ ssize_t Read(int fd, void *buf, size_t count);
  *	@return			Numero di byte rimanenti (pari a 0 se l'operazione va a buon fine)
  */
 ssize_t Write(int fd, const void *buf, size_t count);
+
+/**	Apre un file in lettura e/o scrittura.
+ *	@param pathname	Nome del file da aprire
+ *	@param mode		Permessi
+ */
+FILE *Fopen(const char *pathname, const char *mode);
 
 #endif
