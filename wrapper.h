@@ -10,6 +10,7 @@
 #include <errno.h>			// errno
 #include <netdb.h>			// gethostby*
 #include <string.h>			// memset
+#define BUFSIZE 2048
 
 /**	Crea un endpoint per la comunicazione e restituisce un descrittore di file
  *	che fa riferimento a tale endpoint.
