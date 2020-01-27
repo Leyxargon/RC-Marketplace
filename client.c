@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	
 	
 	/* connessione al server */
-	fputs("Connessione con il serverN in corso...\n", stdout);
+	fputs("Connessione con il serverC in corso...\n", stdout);
 	Connect(sockfd, &servaddr);
 	fputs("Connesso con serverC.\n", stdout);
 	while (1) {
@@ -60,6 +60,8 @@ int main(int argc, char **argv) {
 					fputs("Operazione completata con successo.\n", stdout);
 				else
 					fputs("Operazione fallita.\n", stderr);*/
+				
+				break;
 			case 2:
 				getchar();
 				richiesta.rich = '2';
@@ -74,6 +76,8 @@ int main(int argc, char **argv) {
 					if (p_buf.nome_prodotto[0] != '\0')
 						fprintf(stdout, "Prodotto: %s \n" ,p_buf.nome_prodotto);
 				} while (p_buf.nome_prodotto[0] != '\0');
+				
+				break;
 				
 			case 3:
 				getchar();
