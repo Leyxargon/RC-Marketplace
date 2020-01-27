@@ -1,4 +1,4 @@
-Ciro ciro000
+Ciro.Lugano005 qwerty
 .Dodeca'
 _Olio
 _Biscotti e Dolci
@@ -58,7 +58,7 @@ _Buste immondizia
 _Carta igienica
 _Posate di plastica
 &
-Alice Malfitano
+Alice.Malfitano001 abc123
 .MD
 _Salumi
 _Pasta Fresca
@@ -115,7 +115,7 @@ _Frigoriferi
 _Passaverdura elettrico
 _Tritacarne
 &
-Paolo Esposito00
+Paolo.Esposito009 password
 .Ferramenta Esposito
 _Pinze
 _Viti
@@ -168,7 +168,7 @@ _Tavoli
 _Comodini
 _Mobili da bagno
 _Accessori per la casa
-Giuseppe Giuseppe000
+Giuseppe.Vitrano000 football
 .Tutto Ufficio
 _Block notes
 _Quaderni
@@ -191,4 +191,158 @@ _Scaffalature
 _Lampade da tavolo
 _Cassettiere
 _Schedari
-
+.Profumeria Franzese
+_Profumi
+_Creme
+_Lozioni
+_Maschere
+_Trucchi
+_Bagnoschiuma
+_Tinture per capelli
+.Merceria Stock
+_Dentifricio
+_Spazzolini
+_Spugne
+_Scope
+_Palette
+_Deodoranti
+_Detergenti per pavimenti
+&
+Raffaele.Salvini777 login
+.Lorey Merlino
+_Assi di legno
+_Lastre in cartongesso
+_Attrezzi da giardinaggio
+_Seghe a nastro
+_Carta abrasiva
+_Attrezzi da falegnameria
+_Porte
+_Stufe a pellet
+_Lampadari
+_Mattonelle
+_Rivestimenti PVC
+_Recinzioni da esterno
+.Ceramiche Bonaccini
+_WC
+_Bidet
+_Piastrelle da cucina 
+_Mattonelle
+_Cabine doccia
+_Vasche
+_Rubinetteria
+_Lavandini
+_Mosaici
+_Rivestimenti in ceramiche
+.DigiMondo
+_Televisioni
+_Sony Play station 4
+_Smartphone 
+_Impianti audio Dolby Surround
+_Nintendo Switch
+_XBox One X
+_Videogiochi
+_VR Ps4
+_Smart watch
+.Fumettiamoci
+_Giochi da tavolo
+_Mazzi da gioco Magic
+_Manuali di gioco
+_Miniature per D&D
+_Action Figure
+_Accessori per GDR
+_Maglie Nerd
+.Bar Banera
+_Cornetti
+_Graffe
+_Caffetteria
+_Piccola pasticceria
+_Torte
+_Gelati Artigianali
+_Dolci Tipici
+&
+Sabrina.Siciliano111 admin
+.Atelier Scacco matto
+_Abiti da sposa
+_Completi da cerimonia
+_Scarpe classiche
+_Cravatte
+_Gemelli
+_Camicie
+_Pellicce
+_Cappelli
+_Accessori
+_Borse
+.Striscia la notizia
+_Giornali
+_Riviste gossip
+_Quaderni
+_Penne
+_Album di figurine
+_Diari
+_Fumetti
+.Cavoli vostri
+_Mele
+_Pere
+_Banane
+_Friarielli
+_Insalata
+_Uva
+_Kiwi
+_Cavolo
+&
+Vincenzo.DeLuca258 starwars
+.Bred Pitt
+_Vernici
+_Scale
+_Isolanti
+_Pennelli Cinghiale
+_Secchi
+_Dadi autobloccanti
+_Tasselli
+_gruppi elettrogeni
+.Rossi e Grassi
+_Pasta
+_Prosciutti
+_Mozzarella
+_Latte
+_Olio
+_Merendine
+_Biscotti
+_Yogourt
+_Fagioli
+_Cedrata Procioni
+.Bau bau micio micio
+_Lettiere
+_Mangime
+_Cucce
+_Gabbie 
+_Criceti
+_Ciotole
+_Farmaci PetFarma
+_Acquari
+_Illuminazioni per acquari
+.Indiana jeans
+_Pantaloni
+_Giacche
+_Scarpe
+_Cravatte
+_Camicie
+_Biancheria
+&
+Dario.Lacavalla987 iloveyou
+.Il Droghedario
+_Spezie
+_Erbe Aromatiche
+_Sali
+_Zafferano
+_Insaporitori
+_Pepi da tutto il mondo
+.Pasticceria Libidine
+_Torte
+_Bigne' 
+_Cannoli
+_Pastiere
+_Macaron
+_Muffin
+_Cassate
+_Sfogliatelle
