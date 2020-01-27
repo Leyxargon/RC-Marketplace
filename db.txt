@@ -1,46 +1,194 @@
 Ciro ciro000
 .Dodeca'
-_Uova Fresche Coccode'
-_Frittata
-_Patate fritte al forno
-_Saikebon
-&
-Gennaro Attanasio
-.Drogheria Attanasio
-_Prezzemolo tritato
-_Carne macinata
-_Xbox 360 Arcade 500MB
-.F.lli Venuso
-_Film Alex L'Ariete DVD
-_Discografia Domenico Bini
+_Olio
+_Biscotti e Dolci
+_Frutta
+_Creme Salate
+_Pasta Ripiena
+_Carni
+_Legumi
+_Vini
+_Panificio
+_Farine
+_Vini
+_Latte
+.Wine Bar
+_Vini Italiani
+_Champagne
+_Cognac
+_Calvados
+_Rhum
+_Distillati di frutta
+_Vodka
+_Whisky
+_Vini Europei
+_Amari
+.Dress Up
+_Tshirt
+_Polo
+_Felpe
+_Jeans
+_Scarpe
+_Accessori
+_Intimo
+_Pigiami
+_Pantofole
+_Completi per cerimonie
+.ElettroCiro
+_Cavi elettrici
+_Saldatrici
+_Spine e prese
+_Prolunghe
+_Quadri di distribuzione
+_Interruttori
+_Apparecchi di segnalazione
+_Regolatori elettronici
+_Coprinterruttori
+_Scatole di superficie
+.Carta e Sacchetti
+_Bicchieri monouso
+_Piatti monouso
+_Cannucce
+_Tovaglioli
+_Carta alluminio
+_Vaschette alluminio
+_Carta da forno
+_Pellicola Trasparente
+_Buste immondizia
+_Carta igienica
+_Posate di plastica
 &
 Alice Malfitano
-.EuroSpin
 .MD
-_Giro Giro Ole'
-_Latte Malga Paradiso
-_Caffe' Karisma
-_Pasta Reale
-.Deco'
-_Macine Mulino Bianco
-_Uova
-_Latte Fresco
+_Salumi
+_Pasta Fresca
+_Prodotti Caseari
+_Bibite
+_Rosticceria
+_Pane e panini
+_Olio
+_Uova Fresche
+_Surgelati
+_Gelati
+_Carni
+.Macelleria rampolli
+_Pollo
+_Carne macinata
+_agnello
+_arrosto di maiale
+_cinghiale
+_coppa
+_costolette di maiale
+.Tutto per la casa
+_Set piatti
+_Set bicchieri
+_Barattoli
+_Pirofile
+_Tostapane
+_Mestoli
+_Grattugie
+_Macchina da caffe'
+_Forbici
+_Grembiuli
+_Spremiagrumi
+_Robot multifunzione
+.Biancheria MoonLight
+_Lenzuola
+_Copripiumino
+_Trapunte
+_Fodere per guanciale
+_Copriletto
+_Asciugamani
+_Accappatoi
+_Tende
+_Coperte
+_Tappeti
+.ElettroCasa
+_Bilancia da cucina
+_Bollitore elettrico
+_Lavastoviglie
+_Gelatiera
+_Minipimer
+_Robot multiuso
+_Forni
+_Frigoriferi
+_Passaverdura elettrico
+_Tritacarne
 &
-Amadeus SanRemo
-.Unieuro
-_PlayStation 4 Pro
-_Televisione Blaupunkt 32 pollici
-.GameStop
-.Donne1PassoIndietro
-_Discografia Achille Lauro
-_Discografia Young Signorino
-&
-Gastani frigorifero69
-.GameStop
-_R4i Gold 2019
-_Modchip PlayStation 4
-_Nintendo Switch Moddata
-_Saldatore per modifica PS3
-_Windows 10 craccato
-_Software pirata
-_Office 2019 craccato
+Paolo Esposito00
+.Ferramenta Esposito
+_Pinze
+_Viti
+_Vernici
+_Seghe
+_Scale
+_Pennelli
+_Scaffalature
+_Lampadine
+_Sistemi di fissaggio
+_Fascette stringitubo
+_Prodotti pulizia
+_Solventi
+.WeTechno
+_Notebook
+_Smartphone
+_Monitor
+_Sony Play Station 4
+_XBox One X
+_Nintendo Switch
+_Mouse
+_Tastiere
+_Sedie da gaming
+_Cuffie
+_Microfoni
+_Impianti Dolby Surround
+.Tufaro
+_Lavatrici
+_Asciugatrici
+_Frigoriferi
+_Forni
+_Piani cottura
+_Frullatori
+_Aspirapolvere
+_Ventilatori
+_Lucidatrice
+_Impastatrice
+_Forno a microonde
+_Ferro a vapore
+.Musella Arredamenti
+_Letti
+_Materassi
+_Armadi
+_Scaffalature
+_Divani
+_Poltrone
+_Scrivanie
+_Sedie
+_Tavoli
+_Comodini
+_Mobili da bagno
+_Accessori per la casa
+Giuseppe Giuseppe000
+.Tutto Ufficio
+_Block notes
+_Quaderni
+_Penne
+_Agende
+_Risme Fogli A4
+_Evidenziatori
+_Elastici
+_Matite
+_Levapunti
+_Spillatrici
+_Cuscinetti per timbri
+_Registri
+.UfficioCraft
+_Scrivanie
+_Sedia da ufficio
+_Sedie in pelle
+_Armadi
+_Scaffalature
+_Lampade da tavolo
+_Cassettiere
+_Schedari
+
