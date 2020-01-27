@@ -42,16 +42,13 @@ Utente *inserisciUtente(Utente *top, char User[], char pwd[]) {
 
 Negozio *inserisciNegozio(Negozio *top, char nome_n[]) {
 	if (top == NULL || strcmp(top -> nome_negozio, nome_n) > 0) {
-        printf("inserisciNegozio(%s): inserisco %s in lista.\n", nome_n, nome_n);
 		Negozio *tmp = nuovoNegozio(nome_n);
 		tmp -> next = top;
 		top = tmp;
 		return top;
 	}
-	else {
-        printf("inserisciNegozio(%s): trovato %s\n", nome_n, top -> nome_negozio);
+	else 
 		top -> next = inserisciNegozio(top -> next, nome_n);
-    }
 }
 
 Prodotto *inserisciProdotto(Prodotto *top, char nome_pr[]) {
