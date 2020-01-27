@@ -1,7 +1,7 @@
 #include "liste/lista.h"
 #include "wrapper.h"
 #include "liste/iofile.h"
-#include "pct_c.c"
+#include "pct_c.h"
 #include <time.h>
 #include <string.h>
 
