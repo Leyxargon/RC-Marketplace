@@ -11,6 +11,7 @@
 #include <netdb.h>			// gethostby*
 #include <string.h>			// memset
 #define BUFSIZE 2048
+#define clear() printf("\033[H\033[J")
 
 /**	Crea un endpoint per la comunicazione e restituisce un descrittore di file
  *	che fa riferimento a tale endpoint.
