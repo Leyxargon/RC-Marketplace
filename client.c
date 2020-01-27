@@ -1,5 +1,5 @@
 #include "wrapper.h"
-#include "pct_c.c"
+#include "pct_c.h"
 #include "liste/lista.h"
 #include "liste/iofile.h"
 
