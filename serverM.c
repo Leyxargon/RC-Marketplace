@@ -27,7 +27,9 @@ int main(int argc, char **argv) {
 	FILE *dbf;
 	Utente *u_tmp = NULL;
 	Negozio *n_tmp = NULL;
+	Negozio n_buf;
 	Prodotto *p_tmp = NULL;
+	Prodotto p_buf;
 	
 	/* LETTURA INFORMAZIONI */
 	dbf = Fopen("db.txt", "r+");
@@ -182,51 +184,51 @@ int main(int argc, char **argv) {
 								while (u_tmp != NULL) {
 									n_tmp = u_tmp -> negozi;
 									while (n_tmp != NULL) {
-										sprintf(buf, "%s di %s", n_tmp -> nome_negozio, u_tmp -> username);
-										Write(connfd, buf, sizeof(buf));
+										//sprintf(buf, "%s di %s", n_tmp -> nome_negozio, u_tmp -> username);
+										n_buf=*n_tmp;
+										Write(connfd, &n_buf, sizeof(n_buf));
 										n_tmp = n_tmp -> next;
 									}
 									u_tmp = u_tmp -> next;
 								}
-								Write(connfd, "0", sizeof(buf));
+								n_buf.nome_negozio[0] = '\0';
+								Write(connfd, &n_buf, sizeof(n_buf));
 								break;
 								
 							case '2':
 								fputs("Ricevuta richiesta 2 da serverC\n", stdout);
-								if ((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop)) != NULL) {
-									n_tmp = u_tmp -> negozi;
-									if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL) {
-										p_tmp = n_tmp -> prodotti;
-										while (p_tmp != NULL) {
-											sprintf(buf, "%s", p_tmp -> nome_prodotto);
-											Write(connfd, buf, sizeof(buf));
-											p_tmp = p_tmp -> next;
-										}
-										Write(connfd, "0", sizeof(buf));
+								u_tmp=listaUtenti;
+								n_tmp = u_tmp -> negozi;
+								if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL) {
+									p_tmp = n_tmp -> prodotti;
+									while (p_tmp != NULL) {
+										//sprintf(buf, "%s", p_tmp -> nome_prodotto);
+										p_buf=*p_tmp;
+										Write(connfd, &p_buf, sizeof(p_buf));
+										p_tmp = p_tmp -> next;
+										
 									}
-									else
-										Write(connfd, "1", sizeof(buf)); /* negozio non trovato */
 								}
-								else
-									Write(connfd, "1", sizeof(buf)); /* utente non trovato */
-
+								p_buf.nome_prodotto[0] = '\0';
+								Write(connfd, &p_buf, sizeof(p_buf));
 								break;
 								
 							case '3':
 								fputs("Ricevuta richiesta 3 da serverC\n" , stdout);
-								if ((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop)) != NULL) {
+								//if ((u_tmp = ricercaUtente(listaUtenti, req_c.query.q_prop)) != NULL) {
+									u_tmp=listaUtenti;
 									n_tmp = u_tmp -> negozi; 
 									if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL)
 										p_tmp=n_tmp -> prodotti;
 									else
-										Write(connfd, "1", sizeof(buf));
+										Write(connfd, "1", 1);
 									if ((p_tmp = ricercaProdotto(p_tmp, req_c.query.q_prod)) != NULL)
-										Write(connfd, "0", sizeof(buf)); 
+										Write(connfd, "0", 1); 
 									else
-										Write(connfd, "1", sizeof(buf));
-								}
-								else
-									Write(connfd, "1", sizeof(buf));
+										Write(connfd, "1", 1);
+								///}
+								//else
+									//Write(connfd, "1", sizeof(buf));
 								break;
 						}
 					}

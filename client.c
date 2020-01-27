@@ -1,14 +1,17 @@
 #include "wrapper.h"
 #include "pct_c.c"
+#include "liste/lista.h"
+#include "liste/iofile.h"
 
 int main(int argc, char **argv) {
 	int sockfd, n;
 	char buf[BUFSIZE], buff[INET6_ADDRSTRLEN];
+	int sc;
 	struct sockaddr_in servaddr;
-	struct hostent *cliaddr;
-	
-	char **alias;
-	char *addr;
+	pct_c richiesta;
+	Negozio n_buf;
+	Prodotto p_buf;
+
 	
 	/* gestione errore */
 	if (argc != 2) {
@@ -22,17 +25,82 @@ int main(int argc, char **argv) {
 	servaddr.sin_port = htons(8002);
 	
 	/* lettura indirizzo IP */
-	cliaddr = GetHostByName(argv[1]);
-    alias = cliaddr->h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
-	addr = (char *) inet_ntop(cliaddr->h_addrtype, *alias, buff, sizeof(buff));
-	Inet_pton(AF_INET, addr, &servaddr.sin_addr);
+	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
+		fprintf(stderr,"Errore inet_pton per %s\n", argv[1]);
+		exit(1);
+	}
+	
 	
 	/* connessione al server */
-  fputs("Connessione al serverC\n", stdout);
+	fputs("Connessione con il serverN in corso...\n", stdout);
 	Connect(sockfd, &servaddr);
+	fputs("Connesso con serverC.\n", stdout);
+	while (1) {
+		fputs("Benvenuto, scegli cosa fare\n", stdout);
+		fputs("1. Ricevere l'elenco dei negozi virtuali\n", stdout);
+		fputs("2. Ricevere l'elenco dei prodotti di un negozio virtuale \n", stdout);
+		fputs("3. Cercare un prodotto in un negozio virtuale\n", stdout);
+		fscanf(stdin, "%d", &sc);
+		if (sc == 0) {
+			close(sockfd);
+			break;
+		}
+		switch (sc) {
+			case 1:
+				getchar();
+				richiesta.rich = '1';
+				Write(sockfd, &richiesta, sizeof(richiesta));
+				fputs("Richiesta inviata, attendere prego...\n", stdout);
+				do {					
+					Read(sockfd, &n_buf, sizeof(n_buf));
+					if (n_buf.nome_negozio[0] != '\0')
+						fprintf(stdout, "Negozio: %s \n" ,n_buf.nome_negozio);
+				} while (n_buf.nome_negozio[0] != '\0');
+				/*if (buf[0] == '0')
+					fputs("Operazione completata con successo.\n", stdout);
+				else
+					fputs("Operazione fallita.\n", stderr);*/
+			case 2:
+				getchar();
+				richiesta.rich = '2';
+				fputs("Inserire il nome del negozio: ", stdout);
+				fgets(buf, sizeof(buf), stdin);
+				buf[strcspn(buf, "\r\n")] = '\0';
+				strcpy(richiesta.query.q_neg, buf);
+				Write(sockfd, &richiesta, sizeof(richiesta));
+				fputs("Richiesta inviata, attendere prego...\n", stdout);
+				do {					
+					Read(sockfd, &p_buf, sizeof(p_buf));
+					if (p_buf.nome_prodotto[0] != '\0')
+						fprintf(stdout, "Prodotto: %s \n" ,p_buf.nome_prodotto);
+				} while (p_buf.nome_prodotto[0] != '\0');
+				
+			case 3:
+				getchar();
+				richiesta.rich = '3';
+				fputs("Inserire il nome del negozio: ", stdout);
+				fgets(buf, sizeof(buf), stdin);
+				buf[strcspn(buf, "\r\n")] = '\0';
+				strcpy(richiesta.query.q_neg, buf);
+				fputs("Inserire il nome del prodotto: ", stdout);
+				fgets(buf, sizeof(buf), stdin);
+				buf[strcspn(buf, "\r\n")] = '\0';
+				strcpy(richiesta.query.q_prod, buf);
+				Write(sockfd, &richiesta, sizeof(richiesta));
+				fputs("Richiesta inviata, attendere prego...\n", stdout);
+				Read(sockfd, buf, 1);
+				if(buf[0]=='0')
+					fputs("Prodotto presente\n", stdout);
+				else
+					fputs("Prodotto non presente\n", stdout);
 
-	if (!strncmp(buf, "0", 1)){
-		printf("Connesso al serverC\n");
+				break;
+		}
+	}
+	
+	
+	
+		/*fputs("Connesso al serverC\n", stdout);
 		fputs("Benvenuto, scegli cosa fare\n", stdout);
 		fputs("1. Ricevere l'elenco dei negozi virtuali\n", stdout);
 		fputs("2. Ricevere l'elenco dei prodotti di un negozio virtuale \n", stdout);
@@ -89,12 +157,12 @@ int main(int argc, char **argv) {
         fputs("Prodotto trovato nel negozio\n", stderr);
         }
       }
-    }
+    
   }
 	else {
 		fputs("Connessione fallita\n", stderr);
 		exit(1);
-	}
+	}*/
 
 	exit(0);
 }
