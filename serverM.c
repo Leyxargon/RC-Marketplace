@@ -28,6 +28,8 @@ int main(int argc, char **argv) {
 	Utente *u_tmp = NULL;
 	Negozio *n_tmp = NULL;
 	Prodotto *p_tmp = NULL;
+	Negozio n_buf;
+	Prodotto p_buf;
 	
 	/* LETTURA INFORMAZIONI */
 	dbf = Fopen("db.txt", "r+");
