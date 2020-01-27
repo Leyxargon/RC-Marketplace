@@ -1,14 +1,14 @@
 #include "liste/lista.h"
 #include "wrapper.h"
 #include "liste/iofile.h"
-#include "pct_n.c"
+#include "pct_n.h"
 #include <time.h>
 #include <string.h>
 
 int main(int argc, char **argv) {
 	/* gestione errore */
 	if (argc != 2) {
-		fprintf(stderr,"usage: %s <IPaddress>\n",argv[0]);
+		fprintf(stderr,"uso: %s <IPaddress>\n",argv[0]);
 		exit(1);
 	}
 
@@ -68,62 +68,6 @@ int main(int argc, char **argv) {
 		fputs("Connessione fallita\n", stderr);
 		exit(1);
 	}
-	
-	/*
-	pct_n richiesta;	
-	richiesta.rich = '5';
-	Write(masterfd, &richiesta, sizeof(richiesta));
-	strcpy(login.user, "Roberta");
-	strcpy(login.pass, "frigorifero69");
-	Write(masterfd, &login, sizeof(login));
-	Read(masterfd, buf, 1);
-	if (buf[0] == '0')
-		fputs("Autenticato\n", stdout);
-	else {
-		if (buf[0] == '1')
-			fputs("Utente non valido.\n", stderr);
-		else
-			if (buf[0] == '2')
-				fputs("Password errata.\n", stderr);
-	}
-	
-	richiesta.rich = '4';
-	strcpy(richiesta.user, "Ciro");
-	strcpy(richiesta.query.q_neg, "Dodeca'");
-	strcpy(richiesta.query.q_prod, "Frittata");
-	Write(masterfd, &richiesta, sizeof(richiesta));
-	Read(masterfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
-	}
-	else
-		fputs("Operazione fallita.\n", stdout);
-	
-	richiesta.rich = '1';
-	strcpy(richiesta.user, "Ciro");
-	strcpy(richiesta.query.q_neg, "Patatineria");
-	Write(masterfd, &richiesta, sizeof(richiesta));
-	Read(masterfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
-	}
-	else
-		fputs("Operazione fallita.\n", stdout);
-	
-	richiesta.rich = '3';
-	strcpy(richiesta.user, "Ciro");
-	strcpy(richiesta.query.q_neg, "Patatineria");
-	strcpy(richiesta.query.q_prod, "Patatine buone buone");
-	Write(masterfd, &richiesta, sizeof(richiesta));
-	Read(masterfd, buf, 1);
-	if (buf[0] == '0') {
-		fputs("Operazione effettuata con successo.\n", stdout);
-	}
-	else
-		fputs("Operazione fallita.\n", stdout);
-	
-	close(masterfd);
-	*/
 	
 	/* SERVER verso clientN */
 	/* creazione socket */
@@ -189,16 +133,47 @@ int main(int argc, char **argv) {
 			if ((sockfd = client[i]) >= 0) { /* se il descrittore non è stato selezionato, viene saltato */
 				if (FD_ISSET(sockfd, &read_fd_set)) {
 					/* leggi da sockfd */
-					if (Read(sockfd, &richiesta, sizeof(richiesta)) == 0) {
-						Write(masterfd, &richiesta, sizeof(richiesta));
-						Read(masterfd, buf, 1);
-						if (buf[0] == '0') {
-							fputs("Operazione effettuata con successo.\n", stdout);
-							Write(sockfd, "0", 1);
-						}
-						else {
-							fputs("Operazione fallita.\n", stdout);
-							Write(sockfd, "1", 1);
+					if (!Read(sockfd, &richiesta, sizeof(richiesta))) {
+						switch (richiesta.rich) {
+							case '5':
+								Write(masterfd, &richiesta, sizeof(richiesta));
+								do {
+									Read(masterfd, &buf, sizeof(buf));
+									Write(sockfd, &buf, sizeof(buf));
+								} while (buf[0] != '\0');
+								
+								break;
+							case '6':
+								Write(masterfd, &richiesta, sizeof(richiesta));
+								do {
+									Read(masterfd, &buf, sizeof(buf));
+									Write(sockfd, &buf, sizeof(buf));
+								} while (buf[0] != '\0');
+								
+								break;
+							case '9':	/* RICHIESTA DI LOGIN */
+								Write(sockfd, "0", 1);	/* invio pacchetto di conferma al client */
+								Read(sockfd, &login, sizeof(login));	/* ricezione pacchetto di login dal client */
+								Write(masterfd, &richiesta, sizeof(richiesta));	/* invio pacchetto di richiesta al serverM */
+								Read(masterfd, &buf, 1);		/* lettura esito richiesta dal serverM */
+								Write(masterfd, &login, sizeof(login));	/* invio pacchetto di login al server M */
+								Read(masterfd, &buf, 1);
+								Write(sockfd, &buf, 1);
+								
+								break;
+							default:
+								Write(masterfd, &richiesta, sizeof(richiesta));
+								Read(masterfd, buf, 1);
+								if (buf[0] == '0') {
+									fputs("Operazione effettuata con successo.\n", stdout);
+									Write(sockfd, "0", 1);
+								}
+								else {
+									fputs("Operazione fallita.\n", stdout);
+									Write(sockfd, "1", 1);
+								}
+								
+								break;
 						}
 					}
 					else {
@@ -212,7 +187,5 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-	exit(0);
-	
 	exit(0);
 }
