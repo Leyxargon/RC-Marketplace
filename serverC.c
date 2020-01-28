@@ -69,49 +69,6 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
-	/*richiesta.rich = '1';
-	strcpy(richiesta.query.q_neg, "Dodeca'");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	do {
-		Read(sockfd, buf, sizeof(buf));
-		if (buf[0] != '0')
-			fprintf(stdout, "%s\n", buf);
-	} while (buf[0] != '0');*/
-	
-	/*richiesta.rich = '2';
-	strcpy(richiesta.query.q_neg, "Dodeca'");
-	strcpy(richiesta.query.q_prop, "Amadeus");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	do {
-		Read(sockfd, buf, sizeof(buf));
-		if (buf[0] != '0' && buf[0]!='1')
-			fprintf(stdout, "%s\n", buf);
-	} while (buf[0] != '0' && buf[0]!='1');
-	if(buf[0]=='1'){
-		fputs("Nessun Risultato\n", stderr);
-	
-	}*/
-	
-	/*richiesta.rich = '3';
-	strcpy(richiesta.query.q_neg, "Dodeca'");
-	strcpy(richiesta.query.q_prop, "Ciro");
-	strcpy(richiesta.query.q_prod, "Uova");
-	Write(sockfd, &richiesta, sizeof(richiesta));
-	do {
-		Read(sockfd, buf, sizeof(buf));
-		if (buf[0] != '0' && buf[0]!='1')
-			fprintf(stdout, "%s\n", buf);
-	} while (buf[0] != '0' && buf[0]!='1');
-	if(buf[0]=='1')
-		fputs("Nessun Risultato\n", stderr);
-	else {
-		if(buf[0]=='0'){
-		fputs("Prodotto trovato nel negozio\n", stderr);
-		}
-	
-	
-	close(masterfd);*/
-	
 	/* SERVER verso client */
 	/* creazione socket */
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -123,8 +80,8 @@ int main(int argc, char **argv) {
 	s_servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	s_servaddr.sin_port = htons(8002);
 
-	fprintf(stdout, "IP address is: %s\n", inet_ntoa(s_servaddr.sin_addr));
-	fprintf(stdout, "port is: %d\n", (int) ntohs(s_servaddr.sin_port));
+	fprintf(stdout, "Indirizzo IP: %s\n", inet_ntoa(s_servaddr.sin_addr));
+	fprintf(stdout, "Porta: %d\n", (int) ntohs(s_servaddr.sin_port));
 
 	/* assegnazione indirizzo */
 	Bind(listenfd, &s_servaddr);

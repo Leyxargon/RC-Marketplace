@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
 							exit(1);
 						}
 						switch(req_c.rich) {
-							case '1':
+							case '1':	/* Visualizza l'elenco dei negozi virtuali */
 								fputs("Ricevuta richiesta 1 da serverC\n", stdout);
 								u_tmp = listaUtenti;
 								while (u_tmp != NULL) {
@@ -211,11 +211,15 @@ int main(int argc, char **argv) {
 								Write(connfd, &n_buf, sizeof(n_buf));
 								break;
 								
-							case '2':
+							case '2':	/* Visualizza i prodotti di un negozio */
 								fputs("Ricevuta richiesta 2 da serverC\n", stdout);
 								u_tmp = listaUtenti;
-								n_tmp = u_tmp -> negozi;
-								if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL) {
+								n_tmp = NULL;
+								while (u_tmp != NULL && n_tmp == NULL) { /* ricerca negozio */
+									n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg);
+									u_tmp = u_tmp -> next;
+								}
+								if (n_tmp != NULL) {
 									p_tmp = n_tmp -> prodotti;
 									while (p_tmp != NULL) {
 										p_buf = *p_tmp;
@@ -230,15 +234,18 @@ int main(int argc, char **argv) {
 							case '3':
 								fputs("Ricevuta richiesta 3 da serverC\n" , stdout);
 								u_tmp = listaUtenti;
-								n_tmp = u_tmp -> negozi; 
-								if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg)) != NULL)
-									p_tmp = n_tmp -> prodotti;
-								else
-									Write(connfd, "1", 1);
-								if ((p_tmp = ricercaProdotto(p_tmp, req_c.query.q_prod)) != NULL)
-									Write(connfd, "0", 1); 
-								else
-									Write(connfd, "1", 1);
+								n_tmp = NULL;
+								while (u_tmp != NULL && n_tmp == NULL) { /* ricerca negozio */
+									n_tmp = ricercaNegozio(u_tmp -> negozi, req_c.query.q_neg);
+									u_tmp = u_tmp -> next;
+								}
+								if (n_tmp != NULL) {
+									if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_c.query.q_prod)) != NULL)
+										Write(connfd, "0", 1);
+									else
+										Write(connfd, "1", 1);
+								}
+								
 								break;
 						}
 					}

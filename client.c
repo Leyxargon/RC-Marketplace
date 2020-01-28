@@ -6,7 +6,7 @@
 int main(int argc, char **argv) {
 	int sockfd, n;
 	char buf[BUFSIZE], buff[INET6_ADDRSTRLEN];
-	int sc;
+	int sc, i;
 	struct sockaddr_in servaddr;
 	pct_c richiesta;
 	Negozio n_buf;
@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
-	
 	/* connessione al server */
 	fputs("Connessione con il serverC in corso...\n", stdout);
 	Connect(sockfd, &servaddr);
@@ -51,15 +50,12 @@ int main(int argc, char **argv) {
 				richiesta.rich = '1';
 				Write(sockfd, &richiesta, sizeof(richiesta));
 				fputs("Richiesta inviata, attendere prego...\n", stdout);
+				i = 1;
 				do {					
 					Read(sockfd, &n_buf, sizeof(n_buf));
 					if (n_buf.nome_negozio[0] != '\0')
-						fprintf(stdout, "Negozio: %s \n" ,n_buf.nome_negozio);
+						fprintf(stdout, "%d) %s \n", i++, n_buf.nome_negozio);
 				} while (n_buf.nome_negozio[0] != '\0');
-				/*if (buf[0] == '0')
-					fputs("Operazione completata con successo.\n", stdout);
-				else
-					fputs("Operazione fallita.\n", stderr);*/
 				
 				break;
 			case 2:
@@ -71,10 +67,11 @@ int main(int argc, char **argv) {
 				strcpy(richiesta.query.q_neg, buf);
 				Write(sockfd, &richiesta, sizeof(richiesta));
 				fputs("Richiesta inviata, attendere prego...\n", stdout);
+				i = 1;
 				do {					
 					Read(sockfd, &p_buf, sizeof(p_buf));
 					if (p_buf.nome_prodotto[0] != '\0')
-						fprintf(stdout, "Prodotto: %s \n" ,p_buf.nome_prodotto);
+						fprintf(stdout, "%d) %s \n", i++, p_buf.nome_prodotto);
 				} while (p_buf.nome_prodotto[0] != '\0');
 				
 				break;
