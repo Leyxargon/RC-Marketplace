@@ -49,8 +49,9 @@ int main(int argc, char **argv) {
 			fputs("6) Visualizza i prodotti di un negozio\n", stdout);
 			fputs("0) Esci\n", stdout);
 			sc = getchar();
-		} while (sc < '0' && sc > '7');
+		} while (sc < '0' || sc > '6');
 		getchar();
+		clear();
 		switch (sc) {
 			case '1':
 				richiesta.rich = '1';
