@@ -18,7 +18,6 @@ Utente *importaDati(FILE *fdb) {
                 buf[strcspn(buf, "\r\n")] = '\0';
 				if (!strncmp(buf, ".", 1)) {
 					strcpy(negozio, &buf[1]);
-                    printf("Trovato negozio: %s\n", negozio);
 					user_tmp -> negozi = inserisciNegozio(user_tmp -> negozi, negozio);
 					neg_tmp = ricercaNegozio(user_tmp -> negozi, negozio);
 				}
