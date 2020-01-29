@@ -1,4 +1,5 @@
 #include "iofile.h"
+#include "../wrapper.h"
 
 Utente *importaDati(FILE *fdb) {
 	char username[50];
@@ -36,25 +37,28 @@ Utente *importaDati(FILE *fdb) {
 	return top;
 }
 
-void esportaDati(FILE *dbf, Utente *top) {
+void commit(FILE *dbf, Utente *top) {
 	Utente *user_tmp = top;
 	Negozio *neg_tmp = NULL;
 	Prodotto *prod_tmp = NULL;
 
+	dbf = Fopen("db.txt", "w");
 	while (user_tmp != NULL) {
-		fprintf(dbf, "%s %s\n", user_tmp -> username, user_tmp -> password);
+		fprintf(dbf, "%s %s\r\n", user_tmp -> username, user_tmp -> password);
 		neg_tmp = user_tmp -> negozi;
 		while (neg_tmp != NULL) {
-			fprintf(dbf, ".%s\n", neg_tmp -> nome_negozio);
+			fprintf(dbf, ".%s\r\n", neg_tmp -> nome_negozio);
 			prod_tmp = neg_tmp -> prodotti;
 			while (prod_tmp != NULL) {
-				fprintf(dbf, "_%s\n", prod_tmp -> nome_prodotto);
+				fprintf(dbf, "_%s\r\n", prod_tmp -> nome_prodotto);
 				prod_tmp = prod_tmp -> next;
 			}
 			neg_tmp = neg_tmp -> next;
 		}
 		user_tmp = user_tmp -> next;
 		if (user_tmp != NULL)
-			fprintf(dbf, "&\n");
+			fprintf(dbf, "&\r\n");
 	}
+	fprintf(dbf, "\r\n");
+	fclose(dbf);
 }

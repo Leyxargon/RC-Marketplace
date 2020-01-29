@@ -3,4 +3,4 @@
 #include "lista.h"
 
 Utente *importaDati(FILE *dbf);
-void esportaDati(FILE *dbf, Utente *top);
+void commit(FILE *dbf, Utente *top);
