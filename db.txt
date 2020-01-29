@@ -10,7 +10,6 @@ _Legumi
 _Vini
 _Panificio
 _Farine
-_Vini
 _Latte
 .Wine Bar
 _Vini Italiani
@@ -168,6 +167,7 @@ _Tavoli
 _Comodini
 _Mobili da bagno
 _Accessori per la casa
+&
 Giuseppe.Vitrano000 football
 .Tutto Ufficio
 _Block notes
@@ -308,7 +308,7 @@ _Latte
 _Olio
 _Merendine
 _Biscotti
-_Yogourt
+_Yogurt
 _Fagioli
 _Cedrata Procioni
 .Bau bau micio micio
