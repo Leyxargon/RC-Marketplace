@@ -33,9 +33,16 @@ Acquisto *eliminaAcquisto(Acquisto *top, char prod[]) {
 	return top;
 }
 
+Acquisto *ricercaAcquisto (Acquisto *top, char nomeprodotto[]){
+	if (top == NULL || strcmp(top->prodotto, nomeprodotto)==0)
+		return top;
+	else
+		return ricercaAcquisto(top -> next, nomeprodotto);
+}
+
 void stampaAcquisti(Acquisto *top) {
 	if (top != NULL) {
-		printf("%s -> ", top -> prodotto);
+		printf("%s da %s -> ", top -> prodotto, top -> negozio);
 		stampaAcquisti(top -> next);
 	}
 	else

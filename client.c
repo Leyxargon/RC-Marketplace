@@ -46,9 +46,10 @@ int main(int argc, char **argv) {
 			fputs("2) Ricevere l'elenco dei prodotti di un negozio virtuale \n", stdout);
 			fputs("3) Cercare un prodotto in un negozio virtuale\n", stdout);
 			fputs("4) Visualizzare il carrello\n", stdout);
+			fputs("5) Eliminare un articolo dal carrello\n", stdout);
 			fputs("0) Esci\n", stdout);
 			sc = getchar();
-		} while (sc < '0' || sc > '4');
+		} while (sc < '0' || sc > '5');
 		getchar();
 		clear();
 		switch (sc) {
@@ -100,7 +101,8 @@ int main(int argc, char **argv) {
 					sc = getchar();
 					if (sc == 'S' || sc == 's') {
 						carrello = inserisciAcquisto(carrello, richiesta.query.q_prod, richiesta.query.q_neg);
-						fputs("Prodotto inserito nel carrello.\n", stdout);
+						fputs("Prodotto inserito nel carrello. \n", stdout);
+						getchar();
 					}
 				}
 				else
@@ -109,8 +111,23 @@ int main(int argc, char **argv) {
 				break;
 			case '4':
 				stampaAcquisti(carrello);
+				break;
+				
+			case '5':
+				fputs("Inserire il nome del prodotto: ", stdout);
+                fgets(buf, sizeof(buf), stdin);
+                buf[strcspn(buf, "\r\n")] = '\0';
+                strcpy(richiesta.query.q_prod, buf);
+				if((carrello=ricercaAcquisto(carrello, richiesta.query.q_prod))!=NULL){
+					carrello=eliminaAcquisto(carrello, richiesta.query.q_prod);
+					fputs("Prodotto eliminato correttamente \n", stdout);
+					getchar();
+				}
+				else
+					fputs("Prodotto non trovato \n", stdout);
 				
 				break;
+				
 			default:
 				close(sockfd);
 				exit(0);
