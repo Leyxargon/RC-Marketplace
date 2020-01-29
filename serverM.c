@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	Prodotto p_buf;
 	
 	/* LETTURA INFORMAZIONI */
-	dbf = Fopen("db.txt", "r+");
+	dbf = Fopen("db.txt", "r");
 	fputs("Caricamento dati in corso...\n", stdout);
 	if ((listaUtenti = importaDati(dbf)) == NULL) {
 		fputs("Errore nel caricamento dei dati.\n", stderr);
@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
 	}
 	else
 		fputs("Dati caricati correttamente.\n", stdout);
+	fclose(dbf);
     visualizzaDati(listaUtenti);
 	/************/
 
@@ -82,49 +83,50 @@ int main(int argc, char **argv) {
 					switch (req_n.rich) {
 						case '1':	/* Crea un nuovo negozio virtuale */
 							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL)  /* assicura che il negozio non esista */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL) { /* assicura che il negozio non esista */
 								u_tmp -> negozi = inserisciNegozio(u_tmp -> negozi, req_n.query.q_neg);
-							else
-								Write(connfd, "1", 1);	/* errore: negozio già esistente */
-							
-							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
+								commit(dbf, listaUtenti);
 								visualizzaDati(listaUtenti);
 								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
 							}
 							else
-								Write(connfd, "1", 1);	/* errore */
+								Write(connfd, "1", 1);	/* negozio già esistente */
+							
 							break;
 						case '2':	/* Elimina un negozio virtuale */
 							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
-							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL)  /* assicura che il negozio non esista */
+							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {  /* assicura che il negozio non esista */
 								u_tmp -> negozi = eliminaNegozio(u_tmp -> negozi, req_n.query.q_neg);
-							else
-								Write(connfd, "1", 1); /* errore: negozio inesistente */
-							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) == NULL)
+								commit(dbf, listaUtenti);
+								visualizzaDati(listaUtenti);
 								Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+							}
 							else
-								Write(connfd, "1", 1);	/* errore */
-							visualizzaDati(listaUtenti);
+								Write(connfd, "1", 1); /* negozio inesistente */
+							
 							break;
 						case '3':	/* Aggiungi un prodotto in un negozio virtuale */
 							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
 							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
 								if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) == NULL) {
 									n_tmp -> prodotti = inserisciProdotto(n_tmp -> prodotti, req_n.query.q_prod);
-									Write(connfd, "0", 1);
+									commit(dbf, listaUtenti);
+									visualizzaDati(listaUtenti);
+									Write(connfd, "0", 1);	/* operazione effettuata correttamente */
 								}
 								else
 									Write(connfd, "1", 1);	/* prodotto già esistente in quel negozio */
 							}
 							else
 								Write(connfd, "1", 1);	/* negozio inesistente */
-							visualizzaDati(listaUtenti);
 							break;
 						case '4':	/* Rimuovi un prodotto in un negozio virtuale */
 							u_tmp = ricercaUtente(listaUtenti, req_n.user);		/* seleziona l'utente */
 							if ((n_tmp = ricercaNegozio(u_tmp -> negozi, req_n.query.q_neg)) != NULL) {
 								if ((p_tmp = ricercaProdotto(n_tmp -> prodotti, req_n.query.q_prod)) != NULL) {
 									n_tmp -> prodotti = eliminaProdotto(n_tmp -> prodotti, req_n.query.q_prod);
+									commit(dbf, listaUtenti);
+									visualizzaDati(listaUtenti);
 									Write(connfd, "0", 1);	/* operazione effettuata correttamente */
 								}
 								else
@@ -132,7 +134,6 @@ int main(int argc, char **argv) {
 							}
 							else
 								Write(connfd, "1", 1); /* negozio inesistente */
-							visualizzaDati(listaUtenti);
 							break;
 						case '5':	/* Visualizza i negozi virtuali di un negoziante */
 							u_tmp = ricercaUtente(listaUtenti, req_n.user);
