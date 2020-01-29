@@ -117,9 +117,8 @@ int main(int argc, char **argv) {
 				fputs("Inserire il nome del prodotto: ", stdout);
                 fgets(buf, sizeof(buf), stdin);
                 buf[strcspn(buf, "\r\n")] = '\0';
-                strcpy(richiesta.query.q_prod, buf);
-				if((carrello=ricercaAcquisto(carrello, richiesta.query.q_prod))!=NULL){
-					carrello=eliminaAcquisto(carrello, richiesta.query.q_prod);
+				if(ricercaAcquisto(carrello, buf)!=NULL){
+					carrello=eliminaAcquisto(carrello, buf);
 					fputs("Prodotto eliminato correttamente \n", stdout);
 					getchar();
 				}
