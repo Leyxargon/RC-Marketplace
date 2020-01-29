@@ -1,14 +1,14 @@
 #include "wrapper.h"
-#include "pct_n.h"
-#include "liste/lista.h"
+#include "pct_r.h"
 #include "login.h"
+#include "liste/lista.h"
 
 int main(int argc, char **argv) {
 	int sockfd, n;
 	char buf[BUFSIZE], user[50];
 	int sc;
 	struct sockaddr_in servaddr;
-	pct_n richiesta;
+	pct_r richiesta;
 	
 	/* gestione errore */
 	if (argc != 2) {
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 		switch (sc) {
 			case '1':
 				richiesta.rich = '1';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
 				buf[strcspn(buf, "\r\n")] = '\0';
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 				break;
 			case '2':
 				richiesta.rich = '2';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
 				buf[strcspn(buf, "\r\n")] = '\0';
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 				break;
 			case '3':
 				richiesta.rich = '3';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
 				buf[strcspn(buf, "\r\n")] = '\0';
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 				break;
 			case '4':
 				richiesta.rich = '4';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
 				buf[strcspn(buf, "\r\n")] = '\0';
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
 				break;
 			case '5':
 				richiesta.rich = '5';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				Write(sockfd, &richiesta, sizeof(richiesta));
 				clear();
 				fprintf(stdout, "NEGOZI DI %s\n", user);
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 				break;
 			case '6':
 				richiesta.rich = '6';
-				strcpy(richiesta.user, user);
+				strcpy(richiesta.query.q_user, user);
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
 				buf[strcspn(buf, "\r\n")] = '\0';

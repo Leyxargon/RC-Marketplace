@@ -1,5 +1,5 @@
 #include "wrapper.h"
-#include "pct_c.h"
+#include "pct_r.h"
 #include "liste/lista.h"
 #include "libclient.c"
 #include "acquisto.h"
@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	char sc;
 	int i;
 	struct sockaddr_in servaddr;
-	pct_c richiesta;
+	pct_r richiesta;
 	Negozio n_buf;
 	Prodotto p_buf;
 	Acquisto *carrello = NULL;

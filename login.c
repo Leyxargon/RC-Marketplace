@@ -1,8 +1,8 @@
 #include "login.h"
 
 void login (char *usr_login, int sfd) {
-	pct_n pacchetto;
-	login_n login;
+	pct_r pacchetto;
+	pct_l login;
 	char buf[BUFSIZE], ris;
 	pacchetto.rich = '9';
 	
@@ -46,5 +46,5 @@ void printLogo () {
 	fputs("******** MARKETPLACE ********\n", stdout);
 	fputs("*****************************\n", stdout);
 	fputs("+++++ Client negoziante +++++\n", stdout);
-	fputs("______________________________\n", stdout);
+	fputs("_____________________________\n", stdout);
 }
