@@ -9,7 +9,7 @@ Acquisto *nuovoAcquisto(char prod[], char neg[]) {
 }
 
 Acquisto *inserisciAcquisto(Acquisto *top, char prod[], char neg[]) {
-	if (top == NULL || strcmp(top -> prodotto, prod) > 0) {
+	if (top == NULL) {
 		Acquisto *tmp = nuovoAcquisto(prod, neg);
 		tmp -> next = top;
 		top = tmp;
@@ -22,7 +22,7 @@ Acquisto *inserisciAcquisto(Acquisto *top, char prod[], char neg[]) {
 Acquisto *eliminaAcquisto(Acquisto *top, char prod[]) {
 	Acquisto *tmp;
 	if (top != NULL) {
-		if (strcmp(top -> prodotto, prod)==0) {
+		if (!strcmp(top -> prodotto, prod)) {
 			tmp = top -> next;
 			free(top);
 			top = tmp;
@@ -34,17 +34,21 @@ Acquisto *eliminaAcquisto(Acquisto *top, char prod[]) {
 }
 
 Acquisto *ricercaAcquisto (Acquisto *top, char nomeprodotto[]){
-	if (top == NULL || strcmp(top->prodotto, nomeprodotto)==0)
+	if (top == NULL || !strcmp(top->prodotto, nomeprodotto))
 		return top;
 	else
 		return ricercaAcquisto(top -> next, nomeprodotto);
 }
 
 void stampaAcquisti(Acquisto *top) {
-	if (top != NULL) {
-		printf("%s da %s -> ", top -> prodotto, top -> negozio);
-		stampaAcquisti(top -> next);
+	if (top == NULL)
+		fputs("Il carrello e' vuoto.\n", stdout);
+	else {
+		Acquisto *tmp = top;
+		int i = 1;
+		while (tmp != NULL) {
+			printf("%d) %s da %s\n", i++, tmp -> prodotto, tmp -> negozio);
+			tmp = tmp -> next;
+		}
 	}
-	else
-		printf("NULL\n");
 }

@@ -1,8 +1,7 @@
 #include "liste/lista.h"
 #include "wrapper.h"
 #include "liste/iofile.h"
-#include "pct_r.h"
-#include "pct_l.h"
+#include "pct_n.h"
 
 int main(int argc, char **argv) {
 	/* gestione errore */
@@ -11,6 +10,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	pct_n richiesta;
 	/* VARIABILI SERVER verso clientN */
 	int listenfd, connfd, sockfd;
 	/* 	listenfd: descrittore di ascolto
@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
 	Negozio *n_tmp = NULL;
 	Prodotto *p_tmp = NULL;
 	char buf[BUFSIZE];
-	pct_r richiesta;
-	pct_l login;
+	pct_n req_n;
+	login_n login;
 
 
 	/* CLIENT verso serverM */
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 	/* messa in ascolto */
 	Listen(listenfd, 1024);
 	
-	maxd = masterfd > listenfd ? masterfd : listenfd; /* maxd è il valore massimo dei descrittori in uso */
+	maxd = listenfd; /* maxd è il valore massimo dei descrittori in uso */
 	
 	/* il vettore client contiene i descrittori dei socket connessi */
 	for (i = 0; i < FD_SETSIZE; i++)
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 	
 	FD_ZERO(&active_fd_set); /* inizializza a zero l'insieme dei descrittori */
 	FD_SET(listenfd, &active_fd_set); /* aggiunge il descrittore di ascolto */
-	FD_SET(masterfd, &active_fd_set); /* aggiunge il descrittore del serverM */
+	FD_SET(masterfd, &active_fd_set);
 	
 	/* esecuzione server */
 	while (1) {
@@ -132,7 +132,6 @@ int main(int argc, char **argv) {
 				if (FD_ISSET(sockfd, &read_fd_set)) {
 					/* leggi da sockfd */
 					if (!Read(sockfd, &richiesta, sizeof(richiesta))) {
-						richiesta.type = 'N';
 						switch (richiesta.rich) {
 							case '5':
 								Write(masterfd, &richiesta, sizeof(richiesta));

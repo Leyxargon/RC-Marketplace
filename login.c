@@ -1,8 +1,8 @@
 #include "login.h"
 
 void login (char *usr_login, int sfd) {
-	pct_r pacchetto;
-	pct_l login;
+	pct_n pacchetto;
+	login_n login;
 	char buf[BUFSIZE], ris;
 	pacchetto.rich = '9';
 	
@@ -19,7 +19,7 @@ void login (char *usr_login, int sfd) {
 		buf[strcspn(buf, "\r\n")] = '\0';
 		strcpy(login.pass, buf);
 		Write(sfd, &pacchetto, sizeof(pacchetto));	/* invio pacchetto di richiesta (tipo 5) */
-		Read(sfd, &buf, 1);		/* legge esito */
+		Read(sfd, &buf, 1);		/* lettura esito */
 		Write(sfd, &login, sizeof(login));		/* invio pacchetto di login */
 		fputs("Accesso in corso...\n", stdout);
 		if (Read(sfd, &ris, 1)) {

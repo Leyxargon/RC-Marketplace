@@ -1,7 +1,7 @@
 #include "liste/lista.h"
 #include "wrapper.h"
 #include "liste/iofile.h"
-#include "pct_r.h"
+#include "pct_c.h"
 
 int main(int argc, char **argv) {
 	/* gestione errore */
@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
+	pct_c richiesta;
 	/* VARIABILI SERVER verso clientN */
 	int listenfd, connfd, sockfd;
 	/* 	listenfd: descrittore di ascolto
@@ -38,7 +39,7 @@ int main(int argc, char **argv) {
 	Negozio n_buf;
 	Prodotto p_buf;
 	char buf[BUFSIZE];
-	pct_r richiesta;
+	pct_c req_c;
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
@@ -84,7 +85,7 @@ int main(int argc, char **argv) {
 	/* messa in ascolto */
 	Listen(listenfd, 1024);
 
-	maxd = masterfd > listenfd ? masterfd : listenfd; /* maxd è il valore massimo dei descrittori in uso */
+	maxd = listenfd; /* maxd è il valore massimo dei descrittori in uso */
 
 	/* il vettore client contiene i descrittori dei socket connessi */
 	for (i = 0; i < FD_SETSIZE; i++)
@@ -130,7 +131,6 @@ int main(int argc, char **argv) {
 				if (FD_ISSET(sockfd, &read_fd_set)) {
 					/* leggi da sockfd */
 					if (Read(sockfd, &richiesta, sizeof(richiesta)) == 0) {
-						richiesta.type = 'C';
 						switch (richiesta.rich) {
 							case '1':
 								Write(masterfd, &richiesta, sizeof(richiesta));
@@ -169,5 +169,7 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
+	exit(0);
+	
 	exit(0);
 }

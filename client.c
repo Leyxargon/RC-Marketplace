@@ -1,5 +1,5 @@
 #include "wrapper.h"
-#include "pct_r.h"
+#include "pct_c.h"
 #include "liste/lista.h"
 #include "libclient.c"
 #include "acquisto.h"
@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	char sc;
 	int i;
 	struct sockaddr_in servaddr;
-	pct_r richiesta;
+	pct_c richiesta;
 	Negozio n_buf;
 	Prodotto p_buf;
 	Acquisto *carrello = NULL;
@@ -69,45 +69,51 @@ int main(int argc, char **argv) {
 				richiesta.rich = '2';
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
-				buf[strcspn(buf, "\r\n")] = '\0';
-				strcpy(richiesta.query.q_neg, buf);
-				Write(sockfd, &richiesta, sizeof(richiesta));
-				fputs("Richiesta inviata, attendere prego...\n", stdout);
-				i = 1;
-				do {					
-					Read(sockfd, &p_buf, sizeof(p_buf));
-					if (p_buf.nome_prodotto[0] != '\0')
-						fprintf(stdout, "%d) %s \n", i++, p_buf.nome_prodotto);
-				} while (p_buf.nome_prodotto[0] != '\0');
+				if (buf[0] != '\n') {
+					buf[strcspn(buf, "\r\n")] = '\0';
+					strcpy(richiesta.query.q_neg, buf);
+					Write(sockfd, &richiesta, sizeof(richiesta));
+					fputs("Richiesta inviata, attendere prego...\n", stdout);
+					i = 1;
+					do {					
+						Read(sockfd, &p_buf, sizeof(p_buf));
+						if (p_buf.nome_prodotto[0] != '\0')
+							fprintf(stdout, "%d) %s \n", i++, p_buf.nome_prodotto);
+					} while (p_buf.nome_prodotto[0] != '\0');
+				}
 				
 				break;
 			case '3':
 				richiesta.rich = '3';
 				fputs("Inserire il nome del negozio: ", stdout);
 				fgets(buf, sizeof(buf), stdin);
-				buf[strcspn(buf, "\r\n")] = '\0';
-				strcpy(richiesta.query.q_neg, buf);
-				fputs("Inserire il nome del prodotto: ", stdout);
-				fgets(buf, sizeof(buf), stdin);
-				buf[strcspn(buf, "\r\n")] = '\0';
-				strcpy(richiesta.query.q_prod, buf);
-				Write(sockfd, &richiesta, sizeof(richiesta));
-				fputs("Richiesta inviata, attendere prego...\n", stdout);
-				Read(sockfd, buf, 1);
-				if (buf[0] == '0') {
-					fputs("Prodotto presente\n", stdout);
-					fputs("Inserire il prodotto nel carrello?\n", stdout);
-					fputs("S) Si\nN) No\n", stdout);
-					sc = getchar();
-					if (sc == 'S' || sc == 's') {
-						carrello = inserisciAcquisto(carrello, richiesta.query.q_prod, richiesta.query.q_neg);
-						fputs("Prodotto inserito nel carrello. \n", stdout);
-						getchar();
+				if (buf[0] != '\n') {
+					buf[strcspn(buf, "\r\n")] = '\0';
+					strcpy(richiesta.query.q_neg, buf);
+					fputs("Inserire il nome del prodotto: ", stdout);
+					fgets(buf, sizeof(buf), stdin);
+					if (buf[0] != '\n') {
+						buf[strcspn(buf, "\r\n")] = '\0';
+						strcpy(richiesta.query.q_prod, buf);
+						Write(sockfd, &richiesta, sizeof(richiesta));
+						fputs("Richiesta inviata, attendere prego...\n", stdout);
+						Read(sockfd, buf, 1);
+						if (buf[0] == '0') {
+							fputs("Prodotto presente\n", stdout);
+							fputs("Inserire il prodotto nel carrello?\n", stdout);
+							fputs("S) Si\nN) No\n", stdout);
+							sc = getchar();
+							if (sc == 'S' || sc == 's') {
+								carrello = inserisciAcquisto(carrello, richiesta.query.q_prod, richiesta.query.q_neg);
+								fputs("Prodotto inserito nel carrello. \n", stdout);
+								getchar();
+							}
+						}
+						else
+							fputs("Prodotto non presente\n", stdout);
 					}
 				}
-				else
-					fputs("Prodotto non presente\n", stdout);
-
+				
 				break;
 			case '4':
 				stampaAcquisti(carrello);
