@@ -63,21 +63,21 @@ Prodotto *inserisciProdotto(Prodotto *top, char nome_pr[]) {
 }
 
 Utente *ricercaUtente (Utente *top, char nomeutente[]){
-	if (top == NULL || strcmp(top->username, nomeutente)==0)
+	if (top == NULL || !strcmp(top->username, nomeutente))
 		return top;
 	else
 		return ricercaUtente(top -> next, nomeutente);
 }
 
 Negozio *ricercaNegozio (Negozio *top, char nomenegozio[]){
-	if (top == NULL || strcmp(top->nome_negozio, nomenegozio)==0)
+	if (top == NULL || !strcmp(top->nome_negozio, nomenegozio))
 		return top;
 	else
 		return ricercaNegozio(top -> next, nomenegozio);
 }
 
 Prodotto *ricercaProdotto (Prodotto *top, char nomeprodotto[]){
-	if (top == NULL || strcmp(top->nome_prodotto, nomeprodotto)==0)
+	if (top == NULL || !strcmp(top->nome_prodotto, nomeprodotto))
 		return top;
 	else
 		return ricercaProdotto(top -> next, nomeprodotto);
@@ -86,7 +86,8 @@ Prodotto *ricercaProdotto (Prodotto *top, char nomeprodotto[]){
 Utente *eliminaUtente(Utente *top, char nome[]) {
 	Utente *tmp;
 	if (top != NULL) {
-		if (strcmp(top -> username, nome)==0) {
+		if (!strcmp(top -> username, nome)) {
+			eliminaNegozi(top -> negozi);
 			tmp = top -> next;
 			free(top);
 			top = tmp;
@@ -100,7 +101,8 @@ Utente *eliminaUtente(Utente *top, char nome[]) {
 Negozio *eliminaNegozio(Negozio *top, char nome_negozio[]) {
 	Negozio *tmp;
 	if (top != NULL) {
-		if (strcmp(top -> nome_negozio, nome_negozio)==0) {
+		if (!strcmp(top -> nome_negozio, nome_negozio)) {
+			eliminaProdotti(top -> prodotti);
 			tmp = top -> next;
 			free(top);
 			top = tmp;
@@ -114,7 +116,7 @@ Negozio *eliminaNegozio(Negozio *top, char nome_negozio[]) {
 Prodotto *eliminaProdotto(Prodotto *top, char nome_prodotto[]) {
 	Prodotto *tmp;
 	if (top != NULL) {
-		if (strcmp(top -> nome_prodotto, nome_prodotto)==0) {
+		if (!strcmp(top -> nome_prodotto, nome_prodotto)) {
 			tmp = top -> next;
 			free(top);
 			top = tmp;
@@ -127,6 +129,7 @@ Prodotto *eliminaProdotto(Prodotto *top, char nome_prodotto[]) {
 
 Utente *eliminaUtenti(Utente *top) {
 	if (top != NULL) {
+		eliminaNegozi(top -> negozi);
 		eliminaUtenti(top -> next);
 		free(top);
 	}
@@ -136,6 +139,7 @@ Utente *eliminaUtenti(Utente *top) {
 
 Negozio *eliminaNegozi(Negozio *top) {
 	if (top != NULL) {
+		eliminaProdotti(top -> prodotti);
 		eliminaNegozi(top -> next);
 		free(top);
 	}
