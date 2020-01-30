@@ -149,6 +149,8 @@ int main(int argc, char **argv) {
 								} while (buf[0] != '\0');
 								
 								break;
+							case '8':	/* RICHIESTA DI REGISTRAZIONE */
+
 							case '9':	/* RICHIESTA DI LOGIN */
 								Write(sockfd, "0", 1);	/* invio pacchetto di conferma al client */
 								Read(sockfd, &login, sizeof(login));	/* ricezione pacchetto di login dal client */

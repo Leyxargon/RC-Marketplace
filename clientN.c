@@ -31,7 +31,31 @@ int main(int argc, char **argv) {
 	Connect(sockfd, &servaddr);
 	fputs("Connesso con serverN.\n", stdout);
 	
-	login(user, sockfd);
+	user[0] = '\0';
+	do {
+		clear();
+		do {
+			printLogo();
+			fputs("Benvenuto.\n", stdout);
+			fputs("Selezionare operazione:\n", stdout);
+			fputs("1) Accedi\n", stdout);
+			fputs("2) Registrati\n", stdout);
+			fputs("0) Esci\n", stdout);
+			sc = getchar();
+		} while (sc < '0' || sc > '2');
+		clear();
+		getchar();
+		switch (sc) {
+			case '1':
+				login(user, sockfd);
+				break;
+			case '2':
+				signup(sockfd);
+				break;
+			default:
+				exit(0);
+		}
+	} while (user[0] == '\0');
 	
 	while (1) {
 		do {

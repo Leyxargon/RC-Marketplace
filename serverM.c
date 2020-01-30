@@ -277,6 +277,19 @@ void *serverN(void *args) {
 					Write(connfd, buf, sizeof(buf));
 
 					break;
+				case '8':	/* Richiesta di registrazione */
+					Write(connfd, "0", 1);
+					Read(connfd, &login, sizeof(login));
+					if (ricercaUtente(listaUtenti, login.user) == NULL) {
+						listaUtenti = inserisciUtente(listaUtenti, login.user, login.pass);
+						commit(dbf, listaUtenti);
+						visualizzaDati(listaUtenti);
+						Write(connfd, "0", 1);	/* operazione effettuata correttamente */
+					}
+					else 
+						Write(connfd, "1", 1); /* utente già esistente */
+					
+					break;
 				case '9':	/* Richiesta di login */
 					Write(connfd, "0", 1);
 					Read(connfd, &login, sizeof(login));
