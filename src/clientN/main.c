@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 	struct hostent *cliaddr;
 	char *addr, **alias;
 	cliaddr = GetHostByName(argv[1]);
-    alias = cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+	alias = cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
 	addr = (char *) inet_ntop(cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
 	Inet_pton(AF_INET, addr, &servaddr.sin_addr);
 
