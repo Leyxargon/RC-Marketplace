@@ -3,11 +3,6 @@
 void *serverC(void *args) {
 	Utente *listaUtenti = ((pthread_args *) args) -> listaUtenti;
 	int connfd = ((pthread_args *) args) -> connfd;
-	Utente *u_tmp = NULL;
-	Negozio *n_tmp = NULL;
-	Prodotto *p_tmp = NULL;
-	Negozio n_buf;
-	Prodotto p_buf;
 	pct_c richiesta;
 
 	while (1) {
