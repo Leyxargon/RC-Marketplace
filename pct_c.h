@@ -4,7 +4,6 @@
 typedef struct QUERY_C {
 	char q_neg[50];
 	char q_prod[50];
-	char q_prop[50];
 }query_c;
 
 typedef struct PCT_C {
