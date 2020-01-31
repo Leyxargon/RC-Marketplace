@@ -2,7 +2,7 @@
 
 void signup(int sfd) {
 	pct_n pacchetto;
-	login_n signup;
+	pct_l signup;
 	char buf[BUFSIZE], ris;
 	pacchetto.rich = '8';
 	
@@ -40,7 +40,7 @@ void signup(int sfd) {
 
 void login(char *usr_login, int sfd) {
 	pct_n pacchetto;
-	login_n login;
+	pct_l login;
 	char buf[BUFSIZE], ris;
 	pacchetto.rich = '9';
 	

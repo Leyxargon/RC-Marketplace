@@ -1,14 +1,11 @@
 #ifndef PCT_C_H
 #define PCT_C_H
 
-typedef struct QUERY_C {
-	char q_neg[50];
-	char q_prod[50];
-}query_c;
+#include "pct_q.h"
 
 typedef struct PCT_C {
 	char rich;
-	query_c query;
+	pct_q query;
 }pct_c;
 
 #endif

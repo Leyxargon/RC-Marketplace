@@ -2,6 +2,7 @@
 #include "wrapper.h"
 #include "liste/iofile.h"
 #include "pct_n.h"
+#include "pct_l.h"
 
 int main(int argc, char **argv) {
 	/* gestione errore */
@@ -39,7 +40,7 @@ int main(int argc, char **argv) {
 	Prodotto *p_tmp = NULL;
 	char buf[BUFSIZE];
 	pct_n req_n;
-	login_n login;
+	pct_l credenz;
 
 
 	/* CLIENT verso serverM */
@@ -150,13 +151,12 @@ int main(int argc, char **argv) {
 								
 								break;
 							case '8':	/* RICHIESTA DI REGISTRAZIONE */
-
 							case '9':	/* RICHIESTA DI LOGIN */
 								Write(sockfd, "0", 1);	/* invio pacchetto di conferma al client */
-								Read(sockfd, &login, sizeof(login));	/* ricezione pacchetto di login dal client */
+								Read(sockfd, &credenz, sizeof(credenz));	/* ricezione pacchetto di credenziali dal client */
 								Write(masterfd, &richiesta, sizeof(richiesta));	/* invio pacchetto di richiesta al serverM */
 								Read(masterfd, &buf, 1);		/* lettura esito richiesta dal serverM */
-								Write(masterfd, &login, sizeof(login));	/* invio pacchetto di login al server M */
+								Write(masterfd, &credenz, sizeof(credenz));	/* invio pacchetto di login al server M */
 								Read(masterfd, &buf, 1);
 								Write(sockfd, &buf, 1);
 								

@@ -3,6 +3,7 @@
 #include "liste/iofile.h"
 #include "pct_c.h"
 #include "pct_n.h"
+#include "pct_l.h"
 #include <pthread.h>
 
 void *serverC(void *connfd);
@@ -190,7 +191,7 @@ void *serverN(void *args) {
 	Negozio *n_tmp = NULL;
 	Prodotto *p_tmp = NULL;
 	pct_n richiesta;
-	login_n login;
+	pct_l credenz;
 
 	while (1) {
 		if (!Read(connfd, &richiesta, sizeof(richiesta))) {
@@ -279,9 +280,9 @@ void *serverN(void *args) {
 					break;
 				case '8':	/* Richiesta di registrazione */
 					Write(connfd, "0", 1);
-					Read(connfd, &login, sizeof(login));
-					if (ricercaUtente(listaUtenti, login.user) == NULL) {
-						listaUtenti = inserisciUtente(listaUtenti, login.user, login.pass);
+					Read(connfd, &credenz, sizeof(credenz));
+					if (ricercaUtente(listaUtenti, credenz.user) == NULL) {
+						listaUtenti = inserisciUtente(listaUtenti, credenz.user, credenz.pass);
 						commit(dbf, listaUtenti);
 						visualizzaDati(listaUtenti);
 						Write(connfd, "0", 1);	/* operazione effettuata correttamente */
@@ -292,13 +293,13 @@ void *serverN(void *args) {
 					break;
 				case '9':	/* Richiesta di login */
 					Write(connfd, "0", 1);
-					Read(connfd, &login, sizeof(login));
-					if ((u_tmp = ricercaUtente(listaUtenti, login.user)) == NULL) {
+					Read(connfd, &credenz, sizeof(credenz));
+					if ((u_tmp = ricercaUtente(listaUtenti, credenz.user)) == NULL) {
 						fputs("Utente non valido.\n", stderr);
 						Write(connfd, "1", 1); /* utente non valido */
 					}
 					else {
-						if (!strcmp(u_tmp -> password, login.pass)) {
+						if (!strcmp(u_tmp -> password, credenz.pass)) {
 							fputs("Autenticazione confermata.\n", stdout);
 							Write(connfd, "0", 1);
 						}
