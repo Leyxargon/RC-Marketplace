@@ -7,11 +7,10 @@
 int main(int argc, char **argv) {
 	/* gestione errore */
 	if (argc != 2) {
-		fprintf(stderr,"uso: %s <IPaddress>\n",argv[0]);
+		fprintf(stderr,"uso: %s <IP serverM>\n",argv[0]);
 		exit(1);
 	}
 
-	pct_n richiesta;
 	/* VARIABILI SERVER verso clientN */
 	int listenfd, connfd, sockfd;
 	/* 	listenfd: descrittore di ascolto
@@ -28,20 +27,13 @@ int main(int argc, char **argv) {
 
 	/* VARIABILI CLIENT verso serverM */
 	struct sockaddr_in c_servaddr;
-	struct hostent *c_cliaddr;
 	int masterfd;
 
-	char **alias;
-	char *addr;
-
 	/* VARIABILI LIVELLO APPLICAZIONE */
-	Utente *u_tmp = NULL;
-	Negozio *n_tmp = NULL;
-	Prodotto *p_tmp = NULL;
 	char buf[BUFSIZE];
+	pct_n richiesta;
 	pct_n req_n;
 	pct_l credenz;
-
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
@@ -50,6 +42,8 @@ int main(int argc, char **argv) {
 	c_servaddr.sin_port = htons(8000);
 
 	/* lettura indirizzo IP */
+	struct hostent *c_cliaddr;
+	char *addr, **alias;
 	c_cliaddr = GetHostByName(argv[1]);
     alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
 	addr = (char *) inet_ntop(c_cliaddr -> h_addrtype, *alias, buf, sizeof(buf));

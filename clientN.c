@@ -3,17 +3,18 @@
 #include "liste/lista.h"
 #include "login.h"
 
-int main(int argc, char **argv) {
-	int sockfd, sc, i;
-	char buf[BUFSIZE], user[50];
-	struct sockaddr_in servaddr;
-	pct_n richiesta;
-	
+int main(int argc, char **argv) {	
 	/* gestione errore */
 	if (argc != 2) {
-		fprintf(stderr,"uso: %s <IPaddress>\n",argv[0]);
+		fprintf(stderr,"uso: %s <IP serverN>\n",argv[0]);
 		exit(1);
 	}
+	
+	int sockfd;
+	struct sockaddr_in servaddr;
+	int sc, i;
+	char buf[BUFSIZE], user[50];
+	pct_n richiesta;
 	
 	/* creazione socket */
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -21,10 +22,12 @@ int main(int argc, char **argv) {
 	servaddr.sin_port = htons(8001);
 	
 	/* lettura indirizzo IP */
-	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
-		fprintf(stderr,"Errore inet_pton per %s\n", argv[1]);
-		exit(1);
-	}
+	struct hostent *cliaddr;
+	char *addr, **alias;
+	cliaddr = GetHostByName(argv[1]);
+    alias = cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+	addr = (char *) inet_ntop(cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
+	Inet_pton(AF_INET, addr, &servaddr.sin_addr);
 	
 	fputs("Connessione con il serverN in corso...\n", stdout);
 	/* connessione al server */

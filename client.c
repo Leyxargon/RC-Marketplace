@@ -5,22 +5,20 @@
 #include "acquisto.h"
 
 int main(int argc, char **argv) {
-	int sockfd, n;
-	char buf[BUFSIZE], buff[INET6_ADDRSTRLEN];
-	char sc;
-	int i;
+	/* gestione errore */
+	if (argc != 2) {
+		fprintf(stderr,"uso: %s <IP serverC>\n",argv[0]);
+		exit(1);
+	}
+	
+	int sockfd;
 	struct sockaddr_in servaddr;
+	int sc, i;
+	char buf[BUFSIZE];
 	pct_c richiesta;
 	Negozio n_buf;
 	Prodotto p_buf;
 	Acquisto *carrello = NULL;
-
-	
-	/* gestione errore */
-	if (argc != 2) {
-		fprintf(stderr,"usage: %s <IPaddress>\n",argv[0]);
-		exit(1);
-	}
 	
 	/* creazione socket */
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -28,10 +26,12 @@ int main(int argc, char **argv) {
 	servaddr.sin_port = htons(8002);
 	
 	/* lettura indirizzo IP */
-	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
-		fprintf(stderr,"Errore inet_pton per %s\n", argv[1]);
-		exit(1);
-	}
+	struct hostent *cliaddr;
+	char *addr, **alias;
+	cliaddr = GetHostByName(argv[1]);
+    alias = cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+	addr = (char *) inet_ntop(cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
+	Inet_pton(AF_INET, addr, &servaddr.sin_addr);
 	
 	/* connessione al server */
 	fputs("Connessione con il serverC in corso...\n", stdout);
@@ -63,7 +63,8 @@ int main(int argc, char **argv) {
 					if (n_buf.nome_negozio[0] != '\0')
 						fprintf(stdout, "%d) %s \n", i++, n_buf.nome_negozio);
 				} while (n_buf.nome_negozio[0] != '\0');
-				
+				if (i == 1)
+					fputs("Nessun negozio disponibile.\n", stderr);
 				break;
 			case '2':
 				richiesta.rich = '2';
@@ -80,6 +81,8 @@ int main(int argc, char **argv) {
 						if (p_buf.nome_prodotto[0] != '\0')
 							fprintf(stdout, "%d) %s \n", i++, p_buf.nome_prodotto);
 					} while (p_buf.nome_prodotto[0] != '\0');
+					if (i == 1)
+						fputs("Nessun prodotto disponibile o negozio inesistente.\n", stderr);
 				}
 				
 				break;
