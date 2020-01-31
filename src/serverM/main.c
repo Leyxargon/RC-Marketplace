@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	else
 		fputs("Dati caricati correttamente.\n", stdout);
 	fclose(dbf);
-    visualizzaDati(listaUtenti);
+	visualizzaDati(listaUtenti);
 	/************/
 
 	/* CONNESSIONE */
