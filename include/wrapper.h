@@ -1,4 +1,17 @@
-#include "wrapper.h"
+#ifndef WRAPPER_H
+#define WRAPPER_H
+
+#include <sys/socket.h>
+#include <stdio.h>			// perror
+#include <stdlib.h>			// exit
+#include <unistd.h>			// write, read
+#include <sys/types.h>		// size_t, ssize_t
+#include <arpa/inet.h>		// in_addr struct
+#include <errno.h>			// errno
+#include <netdb.h>			// gethostby*
+#include <string.h>			// memset
+#define BUFSIZE 2048
+#define clear() printf("\033[H\033[J")
 
 /**	Crea un endpoint per la comunicazione e restituisce un descrittore di file
  *	che fa riferimento a tale endpoint.
@@ -8,48 +21,26 @@
  *	@param protocol	Solitamente impostato a 0
  *	@return 		Descrittore del socket appena creato
  */
-int Socket(int family, int type, int protocol) {
-	int fd;
-	if ((fd = socket(family, type, protocol)) < 0) {
-		perror("socket");
-		exit(1);
-	}
-	return fd;
-}
+int Socket(int family, int type, int protocol);
 
 /**	Avvia una connessione su un socket.
  * 	@param sockfd 	Descrittore del socket da connettere
  *	@param servaddr	Indirizzo al quale connettere il socket
  */
-void Connect(int sockfd, struct sockaddr_in *servaddr) {
-	if (connect(sockfd,(struct sockaddr *) servaddr, sizeof(*servaddr)) < 0) {
-		perror("connect");
-		exit(1);
-	}
-}
+void Connect(int sockfd, struct sockaddr_in *servaddr);
 
 /**	Associa un indirizzo ad un socket.
  * 	@param sockfd	Descrittore del socket da assegnare
  *	@param servaddr	Indirizzo da assegnare al socket
  */
-void Bind(int sockfd, struct sockaddr_in *servaddr) {
-	if (bind(sockfd, (struct sockaddr *) servaddr, sizeof(*servaddr)) < 0) {
-		perror("bind");
-		exit(1);
-	}
-}
+void Bind(int sockfd, struct sockaddr_in *servaddr);
 
 /**	Mette il socket in modalità di ascolto in attesa di nuove connessioni.
  * 	@param sockfd		Descrittore del socket da mettere in ascolto
  *	@param queue_length	Dimensione della coda che stabilisce 
  *						il numero di connessioni che possono essere in attesa
  */
-void Listen(int sockfd, int queue_length) {
-	if (listen(sockfd, queue_length) < 0) {
-		perror("listen");
-		exit(1);
-	}
-}
+void Listen(int sockfd, int queue_length);
 
 /** Accetta una connessione su un socket.
  * 	@param sockfd		Descrittore del socket
@@ -57,14 +48,7 @@ void Listen(int sockfd, int queue_length) {
  *	@param addr_dim		Dimensione dell'indirizzo (può essere NULL)
  *	@return				Descrittore del socket associato alla connessione
  */
-int Accept(int sockfd, struct sockaddr_in *clientaddr, socklen_t *addr_dim) {
-	int connfd;
-	if ((connfd = accept(sockfd, (struct sockaddr *) clientaddr, addr_dim)) < 0){
-		perror("accept");
-		exit(1);
-	}
-	return connfd;
-}
+int Accept(int sockfd, struct sockaddr_in *clientaddr, socklen_t *addr_dim);
 
 /**	Converte la stringa passata come secondo argomento
  *	in un indirizzo di rete scritto in network order e
@@ -73,26 +57,14 @@ int Accept(int sockfd, struct sockaddr_in *clientaddr, socklen_t *addr_dim) {
  *	@param src	Stringa in ingresso contenente l'indirizzo IP
  *	@param dst	Buffer dove viene impostato un puntatore che contiene l'indirizzo IP
  */
-void Inet_pton(int af, const char *src, void *dst) {
-	if (inet_pton(af, src, dst) <= 0) {
-		fprintf(stderr,"inet_pton: %s non è valido\n", src);
-		exit(1);
-	}
-}
+void Inet_pton(int af, const char *src, void *dst);
 
 /** Recupera le informazioni sull'host corrispondenti a un indirizzo o un nome simbolico.
  * 	@param name	Indirizzo o nome simbolico
  *	@return		Struttura contenente varie informazioni sull'host passato come parametro
  *				(NULL in caso di errore).
  */
-struct hostent *GetHostByName(const char *name) {
-	struct hostent *host = gethostbyname(name);
-	if (host == NULL){
-		herror("gethostbyname");
-		exit(1);
-	}
-	return host;
-}
+struct hostent *GetHostByName(const char *name);
 
 /** Recupera le informazioni sull'host corrispondenti a un indirizzo o un nome simbolico.
  * 	@param addr	Indirizzo IP
@@ -100,18 +72,7 @@ struct hostent *GetHostByName(const char *name) {
  *	@return		Struttura contenente varie informazioni sull'host passato come parametro
  *				(NULL in caso di errore).
  */
-struct hostent *GetHostByAddr (const char *addr, int type) {
-	struct in_addr addr_net;
-	struct hostent *host = gethostbyaddr((const char *) &addr_net, sizeof(addr_net), type);
-
-	inet_aton(addr, &addr_net);
-
-	if (host == NULL) {
-		herror("gethostbyaddr");
-		exit(1);
-	}
-	return host;
-}
+struct hostent *GetHostByAddr (const char *addr, int type);
 
 /**	Recupera le opzioni impostate su un socket.
  *	@param sockfd	Descrittore del socket
@@ -120,12 +81,7 @@ struct hostent *GetHostByAddr (const char *addr, int type) {
  *	@param optval	Puntatore al buffer in cui viene restituito il valore per l'opzione richiesta
  *	@param optlen	Puntatore alla dimensione in byte del buffer optval
  */
-void GetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t *optlen) {
-	if (getsockopt(sockfd, level, optname, optval, optlen) < 0) {
-		perror("getsockopt");
-		exit(1);
-	}
-}
+void GetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
 
 /**	Imposta delle opzioni su un socket.
  *	@param sockfd	Descrittore del socket
@@ -134,12 +90,7 @@ void GetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t *opt
  *	@param optval	Puntatore al buffer in cui è specificato il valore per l'opzione richiesta
  *	@param optlen	Dimensione in byte del buffer optval
  */
-void SetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t optlen) {
-	if (setsockopt(sockfd, level, optname, optval, optlen) < 0) {
-		perror("setsockopt");
-		exit(1);
-	}
-}
+void SetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t optlen);
 
 /******************************************************
  **                 I/O MULTIPLEXING                 **
@@ -156,14 +107,7 @@ void SetSockOpt(int sockfd, int level, int optname, void *optval, socklen_t optl
  *	@return	Numero di descrittori disponibili
  */
 
-int Select(int maxfdp, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
-	int n;
-	if ((n = select(maxfdp, readfds, writefds, exceptfds, timeout)) < 0) {
-		perror("select");
-		exit(1);
-	}
-	return n;
-}
+int Select(int maxfdp, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
 /******************************************************
  **       FUNZIONI E PROCEDURE DI USO GENERICO       **
@@ -172,14 +116,7 @@ int Select(int maxfdp, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, str
 /**	Crea un nuovo processo duplicando il processo chiamante.
  *	@return	pid ID del processo (uguale a 0 nel figlio, diverso da 0 nel genitore)
  */
-pid_t Fork(void) {
-	int pid;
-	if ((pid = fork()) < 0) {
-		perror ("fork");
-		exit(1);
-	}
-	return pid;
-}
+pid_t Fork(void);
 
 /** Legge da un buffer contenuto in un descrittore un numero finito di byte.
  *	Controlla l'operazione della chiamata di sistema read() gestendo gli eventuali
@@ -189,29 +126,7 @@ pid_t Fork(void) {
  *	@param count	Numero di byte da leggere
  *	@return			Numero di byte rimanenti (pari a 0 se l'operazione va a buon fine)
  */
-ssize_t Read(int fd, void *buf, size_t count) {
-	size_t nleft;	/* numero di byte rimanenti da leggere */ 
-	ssize_t nread;	/* numero di byte letti (utilizzato per gestire gli spiazzamenti per *buf) */
-	nleft = count;
-	memset(buf, 0, count);
-	while (nleft > 0) {
-		if ((nread = read(fd, buf, nleft)) < 0) {
-			if (errno == EINTR)
-				continue;			/* continua se read() è interrotta da chiamata di sistema */
-			else {
-				perror("read");
-				exit(nread);
-			}
-		}
-		else
-			if (nread == 0) /* EOF */
-				break;
-		nleft -= nread; /* imposta il numero di byte rimanenti a quelli da leggere */
-		buf += nread;	/* spiazzamento puntatore a buffer */
-	}
-	buf = 0;
-	return nleft;
-}
+ssize_t Read(int fd, void *buf, size_t count);
 
 /** Scrive su un buffer contenuto in un descrittore un numero finito di byte.
  *	Controlla l'operazione della chiamata di sistema write() gestendo gli eventuali
@@ -221,34 +136,12 @@ ssize_t Read(int fd, void *buf, size_t count) {
  *	@param count	Numero di byte da scrivere
  *	@return			Numero di byte rimanenti (pari a 0 se l'operazione va a buon fine)
  */
-ssize_t Write(int fd, const void *buf, size_t count) { 
-	size_t nleft;		/* numero di byte rimanenti da scrivere */ 
-	ssize_t nwritten;	/* numero di byte scritti (utilizzato per gestire gli spiazzamenti per *buf) */
-	nleft = count;
-	while (nleft > 0) {
-		if ((nwritten = write(fd, buf, nleft)) < 0) {
-			if (errno == EINTR)
-				continue;			/* continua se write() è interrotta da chiamata di sistema */
-			else {
-				perror("write");
-				exit(nwritten);
-			}
-		}
-		nleft -= nwritten;	/* imposta il numero di byte rimanenti a quelli da scrivere */
-		buf +=nwritten;		/* spiazzamento puntatore a buffer */
-	}
-	return nleft; 
-}
+ssize_t Write(int fd, const void *buf, size_t count);
 
 /**	Apre un file in lettura e/o scrittura.
  *	@param pathname	Nome del file da aprire
  *	@param mode		Permessi
  */
-FILE *Fopen(const char *pathname, const char *mode) {
-	FILE *file;
-	if ((file = fopen(pathname, mode)) == NULL) {
-		perror("fopen");
-		exit(1);
-	}
-	return file;
-}
+FILE *Fopen(const char *pathname, const char *mode);
+
+#endif

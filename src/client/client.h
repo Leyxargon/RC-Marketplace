@@ -1,0 +1,5 @@
+#include "../../include/wrapper.h"
+#include "../../include/pct_c.h"
+#include "../../include/lista.h"
+#include "libclient.c"
+#include "acquisto.h"
