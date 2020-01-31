@@ -173,10 +173,11 @@ int main(int argc, char **argv) {
 				for (i = 0; i < strlen(buf) - 1; i++)
 					fputc('=', stdout);
 				fputc('\n', stdout);
+				i = 1;
 				do {
 					Read(sockfd, &buf, sizeof(buf));
 					if (buf[0] != '\0')
-						fprintf(stdout, "%s\n", buf);
+						fprintf(stdout, "%d) %s\n", i++, buf);
 				} while (buf[0] != '\0');
 				
 				break;
@@ -195,11 +196,14 @@ int main(int argc, char **argv) {
 					for (i = 0; i < strlen(buf) - 1; i++)
 						fputc('=', stdout);
 					fputc('\n', stdout);
+					i = 1;
 					do {
 						Read(sockfd, &buf, sizeof(buf));
 						if (buf[0] != '\0')
-							fprintf(stdout, "%s\n", buf);
+							fprintf(stdout, "%d) %s\n", i++, buf);
 					} while (buf[0] != '\0');
+					if (i == 1)
+						fputs("Negozio vuoto o inesistente.\n", stderr);
 				}
 				
 				break;
