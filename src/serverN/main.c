@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	struct hostent *c_cliaddr;
 	char *addr, **alias;
 	c_cliaddr = GetHostByName(argv[1]);
-    alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+	alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
 	addr = (char *) inet_ntop(c_cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
 	Inet_pton(AF_INET, addr, &c_servaddr.sin_addr);
 
