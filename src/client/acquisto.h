@@ -12,5 +12,5 @@ typedef struct listaAcq {
 Acquisto *nuovoAcquisto(char prod[], char neg[]);
 Acquisto *inserisciAcquisto(Acquisto *top, char prod[], char neg[]);
 Acquisto *eliminaAcquisto(Acquisto *top, char prod[]);
-Acquisto *ricercaAcquisto (Acquisto *top, char nomeprodotto[]);
+Acquisto *ricercaAcquisto(Acquisto *top, char nomeprodotto[]);
 void stampaAcquisti(Acquisto *top);

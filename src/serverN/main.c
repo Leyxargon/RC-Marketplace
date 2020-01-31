@@ -121,50 +121,8 @@ int main(int argc, char **argv) {
 			if ((sockfd = client[i]) >= 0) { /* se il descrittore non è stato selezionato, viene saltato */
 				if (FD_ISSET(sockfd, &read_fd_set)) {
 					/* leggi da sockfd */
-					if (!Read(sockfd, &richiesta, sizeof(richiesta))) {
-						switch (richiesta.rich) {
-							case '5':
-								Write(masterfd, &richiesta, sizeof(richiesta));
-								do {
-									Read(masterfd, &buf, sizeof(buf));
-									Write(sockfd, &buf, sizeof(buf));
-								} while (buf[0] != '\0');
-
-								break;
-							case '6':
-								Write(masterfd, &richiesta, sizeof(richiesta));
-								do {
-									Read(masterfd, &buf, sizeof(buf));
-									Write(sockfd, &buf, sizeof(buf));
-								} while (buf[0] != '\0');
-
-								break;
-							case '8':	/* RICHIESTA DI REGISTRAZIONE */
-							case '9':	/* RICHIESTA DI LOGIN */
-								Write(sockfd, "0", 1);	/* invio pacchetto di conferma al client */
-								Read(sockfd, &credenz, sizeof(credenz));	/* ricezione pacchetto di credenziali dal client */
-								Write(masterfd, &richiesta, sizeof(richiesta));	/* invio pacchetto di richiesta al serverM */
-								Read(masterfd, &buf, 1);		/* lettura esito richiesta dal serverM */
-								Write(masterfd, &credenz, sizeof(credenz));	/* invio pacchetto di login al server M */
-								Read(masterfd, &buf, 1);
-								Write(sockfd, &buf, 1);
-
-								break;
-							default:
-								Write(masterfd, &richiesta, sizeof(richiesta));
-								Read(masterfd, buf, 1);
-								if (buf[0] == '0') {
-									fputs("Operazione effettuata con successo.\n", stdout);
-									Write(sockfd, "0", 1);
-								}
-								else {
-									fputs("Operazione fallita.\n", stdout);
-									Write(sockfd, "1", 1);
-								}
-
-								break;
-						}
-					}
+					if (!Read(sockfd, &richiesta, sizeof(richiesta)))
+						elaboraRichiesta(masterfd, sockfd, &richiesta);
 					else {
 						/* chiusura connessione da parte del client */
 						fputs("Connessione chiusa da client.\n", stdout);

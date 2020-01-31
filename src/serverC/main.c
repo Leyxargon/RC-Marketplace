@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
 	/* 	listenfd: descrittore di ascolto
 	 *	connfd: descrittore di connessione
 	 */
-	int len;
 	struct sockaddr_in s_servaddr, s_cliaddr;
+	int len = sizeof(s_cliaddr);
 	/* 	servaddr: informazioni indirizzo server
 	 *	cliaddr: informazioni indirizzo client connesso
 	 */
@@ -27,8 +27,6 @@ int main(int argc, char **argv) {
 	/* VARIABILI LIVELLO APPLICAZIONE */
 	char buf[BUFSIZE];
 	pct_c richiesta;
-	Negozio n_buf;
-	Prodotto p_buf;
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
@@ -121,34 +119,8 @@ int main(int argc, char **argv) {
 			if ((sockfd = client[i]) >= 0) { /* se il descrittore non è stato selezionato, viene saltato */
 				if (FD_ISSET(sockfd, &read_fd_set)) {
 					/* leggi da sockfd */
-					if (Read(sockfd, &richiesta, sizeof(richiesta)) == 0) {
-						switch (richiesta.rich) {
-							case '1':
-								Write(masterfd, &richiesta, sizeof(richiesta));
-								do {
-									Read(masterfd, &n_buf, sizeof(n_buf));
-									Write(sockfd, &n_buf, sizeof(n_buf));
-								} while (n_buf.nome_negozio[0] != '\0');
-								break;
-
-							case '2':
-								Write(masterfd, &richiesta, sizeof(richiesta));
-								do {
-									Read(masterfd, &p_buf, sizeof(p_buf));
-									Write(sockfd, &p_buf, sizeof(p_buf));
-								} while (p_buf.nome_prodotto[0] != '\0');
-
-								break;
-
-							case '3':
-								Write(masterfd, &richiesta, sizeof(richiesta));
-									Read(masterfd, buf, 1);
-									Write(sockfd, buf, 1);
-
-								break;
-						}
-
-					}
+					if (!Read(sockfd, &richiesta, sizeof(richiesta)))
+						elaboraRichiesta(masterfd, sockfd, &richiesta);
 					else {
 						/* chiusura connessione da parte del client */
 						fputs("Connessione chiusa da client.\n", stdout);

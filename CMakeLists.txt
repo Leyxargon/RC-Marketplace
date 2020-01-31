@@ -24,14 +24,20 @@ AUX_SOURCE_DIRECTORY(${MARKETPLACE}/lib LIBS_FILES)
 add_library(libraries ${LIBS_FILES})
 
 #compilazione dei sorgenti
-add_executable(serverM ${MARKETPLACE}/src/serverM/main.c ${LIBS_FILES})
+set(LIB_SERVERM ${MARKETPLACE}/src/serverM/serverM.c)
+set(LIB_THREADN ${MARKETPLACE}/src/serverM/threadN.c)
+set(LIB_THREADC ${MARKETPLACE}/src/serverM/threadC.c)
+add_executable(serverM ${MARKETPLACE}/src/serverM/main.c ${LIB_SERVERM} ${LIB_THREADN} ${LIB_THREADC} ${LIBS_FILES})
 
-add_executable(serverN ${MARKETPLACE}/src/serverN/main.c ${LIBS_FILES})
+set(LIB_SERVERN ${MARKETPLACE}/src/serverN/serverN.c)
+add_executable(serverN ${MARKETPLACE}/src/serverN/main.c ${LIB_SERVERN} ${LIBS_FILES})
 
-add_executable(serverC ${MARKETPLACE}/src/serverC/main.c ${LIBS_FILES})
+set(LIB_SERVERC ${MARKETPLACE}/src/serverC/serverC.c)
+add_executable(serverC ${MARKETPLACE}/src/serverC/main.c ${LIB_SERVERC} ${LIBS_FILES})
 
-set(LIB_LOGIN ${MARKETPLACE}/src/clientN/login.c)
-add_executable(clientN ${MARKETPLACE}/src/clientN/main.c ${LIB_LOGIN} ${LIBS_FILES})
+set(LIB_CLIENTN ${MARKETPLACE}/src/clientN/clientN.c)
+add_executable(clientN ${MARKETPLACE}/src/clientN/main.c ${LIB_CLIENTN} ${LIBS_FILES})
 
 set(LIB_ACQUISTO ${MARKETPLACE}/src/client/acquisto.c)
-add_executable(client ${MARKETPLACE}/src/client/main.c ${LIB_ACQUISTO} ${LIBS_FILES})
+set(LIB_CLIENT ${MARKETPLACE}/src/client/client.c)
+add_executable(client ${MARKETPLACE}/src/client/main.c ${LIB_CLIENT} ${LIB_ACQUISTO} ${LIBS_FILES})
