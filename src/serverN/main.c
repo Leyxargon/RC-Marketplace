@@ -1,12 +1,34 @@
 #include "serverN.h"
 
 int main(int argc, char **argv) {
-	/* gestione errore */
-	if (argc != 2) {
-		fprintf(stderr,"uso: %s <IP serverM>\n",argv[0]);
-		exit(1);
+	int opt, portM = 8000, portN = 8001;
+	char address[200];
+	address[0] = '\0';
+	if (argc < 3 || argc > 7)
+		printUsage(argv[0]);
+	else {
+		while ((opt = getopt(argc, argv, "i:p:m:")) != -1) {
+			switch (opt) {
+				case 'i':
+					strcpy(address, optarg);
+					break;
+				case 'p':
+					if ((portN = atoi(optarg)) <= 0)
+						printUsage(argv[0]);
+					break;
+				case 'm':
+					if ((portM = atoi(optarg)) <= 0)
+						printUsage(argv[0]);
+					break;
+				case ':':
+				case '?':
+					printUsage(argv[0]);
+			}
+		}
+		if (address[0] == '\0')
+			printUsage(argv[0]);
 	}
-
+	
 	/* VARIABILI SERVER verso clientN */
 	int listenfd, connfd, sockfd;
 	/* 	listenfd: descrittore di ascolto
@@ -19,6 +41,12 @@ int main(int argc, char **argv) {
 	 */
 	int len = sizeof(s_cliaddr);
 	int option = 1, i, maxi = -1, maxd, ready, client[FD_SETSIZE];
+	/*	option: flag per SetSockOpt
+	 *	maxi: indice massimo
+	 *	maxd: descrittore massimo
+	 *	ready: numero di descrittori pronti
+	 *	client: array di client connessi
+	 */
 	fd_set active_fd_set, read_fd_set;	/* insiemi di descrittori */
 
 	/* VARIABILI CLIENT verso serverM */
@@ -28,32 +56,30 @@ int main(int argc, char **argv) {
 	/* VARIABILI LIVELLO APPLICAZIONE */
 	char buf[BUFSIZE];
 	pct_n richiesta;
-	pct_l credenz;
 
 	/* CLIENT verso serverM */
 	/* creazione socket */
 	masterfd = Socket(AF_INET, SOCK_STREAM, 0);
 	c_servaddr.sin_family = AF_INET;
-	c_servaddr.sin_port = htons(8000);
+	c_servaddr.sin_port = htons(portM);
 
 	/* lettura indirizzo IP */
 	struct hostent *c_cliaddr;
 	char *addr, **alias;
-	c_cliaddr = GetHostByName(argv[1]);
-	alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+	c_cliaddr = GetHostByName(address);
+    alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
 	addr = (char *) inet_ntop(c_cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
 	Inet_pton(AF_INET, addr, &c_servaddr.sin_addr);
 
 	/* connessione al server */
 	Connect(masterfd, &c_servaddr);
-
 	fputs("Connessione al serverM\n", stdout);
 	Write(masterfd, "N", 1);	/* identificazione al server */
-	Read(masterfd, buf, 1);	/* leggi esito connessione */
-	if (!strncmp(buf, "0", 1))
+	Read(masterfd, buf, 1);	/* lettura esito connessione */
+	if (buf[0] == '0')
 		printf("Connesso al serverM\n");
 	else {
-		fputs("Connessione fallita\n", stderr);
+		fputs("Connessione fallita.\n", stderr);
 		exit(1);
 	}
 
@@ -66,7 +92,7 @@ int main(int argc, char **argv) {
 	/* indirizzo del server */
 	s_servaddr.sin_family = AF_INET;
 	s_servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	s_servaddr.sin_port = htons(8001);
+	s_servaddr.sin_port = htons(portN);
 
 	fprintf(stdout, "Indirizzo IP: %s\n", inet_ntoa(s_servaddr.sin_addr));
 	fprintf(stdout, "Porta: %d\n", (int) ntohs(s_servaddr.sin_port));
@@ -76,15 +102,14 @@ int main(int argc, char **argv) {
 	/* messa in ascolto */
 	Listen(listenfd, 1024);
 
-	maxd = listenfd; /* maxd è il valore massimo dei descrittori in uso */
-
-	/* il vettore client contiene i descrittori dei socket connessi */
+	maxd = listenfd;
+	
 	for (i = 0; i < FD_SETSIZE; i++)
-		client[i] = -1; /* inizializza il vettore di client */
+		client[i] = -1; /* inizializzazione vettore di client */
 
-	FD_ZERO(&active_fd_set); /* inizializza a zero l'insieme dei descrittori */
-	FD_SET(listenfd, &active_fd_set); /* aggiunge il descrittore di ascolto */
-	FD_SET(masterfd, &active_fd_set);
+	FD_ZERO(&active_fd_set); /* inizializzazione a zero l'insieme dei descrittori */
+	FD_SET(listenfd, &active_fd_set); /* aggiunta del descrittore di ascolto */
+	FD_SET(masterfd, &active_fd_set); /* aggiunta del descrittore associato al serverM */
 
 	/* esecuzione server */
 	while (1) {
@@ -96,23 +121,33 @@ int main(int argc, char **argv) {
 		if (FD_ISSET(listenfd, &read_fd_set)) {
 			/* accettazione richiesta di connessione */
 			connfd = Accept(listenfd, &s_cliaddr, &len);
-			for (i = 0; i < FD_SETSIZE; i++)
-				if (client[i] < 0) {
-					client[i] = connfd;
-					break;
+			Read(connfd, buf, 1);
+			if (buf[0] == 'n') {
+				/* identificazione client */
+				Write(connfd, "0", 1);
+				for (i = 0; i < FD_SETSIZE; i++)
+					if (client[i] < 0) {
+						client[i] = connfd;
+						break;
+					}
+				/* errore se non ci sono posti liberi nel vettore client */
+				if (i == FD_SETSIZE) {
+					fputs("accept: client array size full\n", stderr);
+					exit(1);
 				}
-			/* errore se non ci sono posti liberi nel vettore client */
-			if (i == FD_SETSIZE) {
-				fputs("accept: client array size full\n", stderr);
-				exit(1);
+				fputs("Client connesso.\n", stdout);
+				/* inserisce connfd tra i descrittori da controllare ed aggiorna maxd */
+				FD_SET(connfd, &active_fd_set);
+				if (connfd > maxd)
+					maxd = connfd;
+				if (i > maxi)
+					maxi = i;
 			}
-			fputs("Client connesso.\n", stdout);
-			/* inserisce connfd tra i descrittori da controllare ed aggiorna maxd */
-			FD_SET(connfd, &active_fd_set);
-			if (connfd > maxd)
-				maxd = connfd;
-			if (i > maxi)
-				maxi = i;
+			else {
+				Write(connfd, "1", 1);
+				close(connfd);
+				fputs("Connessione client rifiutata.\n", stderr);
+			}
 			--ready; /* richiesta accettata/rifiutata, un socket in meno */
 		}
 

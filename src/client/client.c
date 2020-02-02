@@ -125,3 +125,10 @@ Acquisto *rimuoviProdotto(Acquisto *carrello) {
 	}
 	return carrello;
 }
+
+void printUsage(char *prog) {
+	fprintf(stderr, "uso: %s -i <indirizzo> [opzione]\n", prog);
+	fputs("\t-i <indirizzo>\t\tIndirizzo serverC\n", stderr);
+	fputs("\t-p <porta>\t\tNumero di porta serverC [default: 8002]\n", stderr);
+	exit(1);
+}

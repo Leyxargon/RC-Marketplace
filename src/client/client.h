@@ -9,3 +9,4 @@ void visualizzaNegozi(int sockfd);
 void visualizzaProdottiNeg(int sockfd);
 Acquisto *cercaProdotto(int sockfd, Acquisto *carrello);
 Acquisto *rimuoviProdotto(Acquisto *carrello);
+void printUsage(char *prog);

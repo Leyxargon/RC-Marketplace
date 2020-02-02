@@ -14,3 +14,4 @@ void insProdotto(int sockfd, char *user);
 void cancProdotto(int sockfd, char *user);
 void visualizzaNegozi(int sockfd, char *user);
 void visualizzaProdottiNeg(int sockfd, char *user);
+void printUsage(char *prog);

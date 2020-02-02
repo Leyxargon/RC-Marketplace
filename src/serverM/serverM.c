@@ -75,3 +75,9 @@ void *serverN(void *args) {
 	}
 	pthread_exit(NULL);
 }
+
+void printUsage(char *prog) {
+	fprintf(stderr, "uso: %s [-p <porta>]\n", prog);
+	fputs("\t-p <porta>\t\tNumero di porta [default: 8000]\n", stderr);
+	exit(1);
+}

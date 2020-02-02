@@ -5,3 +5,4 @@
 #include "../../include/pct_l.h"
 
 void elaboraRichiesta(int masterfd, int sockfd, pct_n *richiesta);
+void printUsage(char *prog);

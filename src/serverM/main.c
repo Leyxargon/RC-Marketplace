@@ -1,6 +1,24 @@
 #include "serverM.h"
 
 int main(int argc, char **argv) {
+	int opt, port = 8000;
+	if (argc > 3)
+		printUsage(argv[0]);
+	else
+		if (argc > 1) {
+			while ((opt = getopt(argc, argv, "p:")) != -1) {
+				switch (opt) {
+					case 'p':
+						if ((port = atoi(optarg)) <= 0)
+							printUsage(argv[0]);
+						break;
+					case ':':
+					case '?':
+						printUsage(argv[0]);
+				}
+			}
+		}
+	
 	/* VARIABILI SERVER */
 	int listenfd, connfd;
 	/* 	listenfd: descrittore di ascolto
@@ -29,7 +47,8 @@ int main(int argc, char **argv) {
 	else
 		fputs("Dati caricati correttamente.\n", stdout);
 	fclose(dbf);
-	visualizzaDati(listaUtenti);
+    visualizzaDati(listaUtenti);
+
 	/************/
 
 	/* CONNESSIONE */
@@ -38,7 +57,7 @@ int main(int argc, char **argv) {
 	/* indirizzo del server */
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(8000);
+	servaddr.sin_port = htons(port);
 
 	fprintf(stdout, "Indirizzo IP: %s\n", inet_ntoa(servaddr.sin_addr));
 	fprintf(stdout, "Porta: %d\n", (int) ntohs(servaddr.sin_port));
@@ -76,8 +95,8 @@ int main(int argc, char **argv) {
 			}
 		}
 		else {
-			Write(connfd, "0", 1);
-			fputs("Server non riconosciuto.\n", stderr);
+			Write(connfd, "1", 1);
+			fputs("Connessione rifiutata: server non riconosciuto.\n", stderr);
 			close(connfd);
 		}
 	}

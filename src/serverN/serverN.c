@@ -32,3 +32,11 @@ void elaboraRichiesta(int masterfd, int sockfd, pct_n *richiesta) {
 			break;
 	}
 }
+
+void printUsage(char *prog) {
+	fprintf(stderr, "uso: %s -i <indirizzo> [opzione...]\n", prog);
+	fputs("\t-i <indirizzo>\t\tIndirizzo serverM\n", stderr);
+	fputs("\t-m <porta>\t\tNumero di porta serverM [default: 8000]\n", stderr);
+	fputs("\t-p <porta>\t\tNumero di porta serverN [default: 8001]\n", stderr);
+	exit(1);
+}

@@ -19,5 +19,6 @@ typedef struct PTHREAD_ARGS {
 
 void *serverC(void *connfd);
 void *serverN(void *connfd);
+void printUsage(char *prog);
 
 #endif

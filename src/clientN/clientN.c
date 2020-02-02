@@ -301,3 +301,10 @@ void visualizzaProdottiNeg(int sockfd, char *user) {
 			fputs("Negozio vuoto o inesistente.\n", stderr);
 	}
 }
+
+void printUsage(char *prog) {
+	fprintf(stderr, "uso: %s -i <indirizzo> [opzione]\n", prog);
+	fputs("\t-i <indirizzo>\t\tIndirizzo serverN\n", stderr);
+	fputs("\t-p <porta>\t\tNumero di porta serverN [default: 8001]\n", stderr);
+	exit(1);
+}
