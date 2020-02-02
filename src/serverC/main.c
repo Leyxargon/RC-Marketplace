@@ -48,6 +48,8 @@ int main(int argc, char **argv) {
 	 *	client: array di client connessi
 	 */
 	fd_set active_fd_set, read_fd_set;	/* insiemi di descrittori */
+	char iplog[FD_SETSIZE][16];	/* array di indirizzi IP usato per il logging */
+	int portlog[FD_SETSIZE];	/* array di porte usato per il logging */
 
 	/* VARIABILI CLIENT verso serverM */
 	struct sockaddr_in c_servaddr;
@@ -136,7 +138,9 @@ int main(int argc, char **argv) {
 					fputs("accept: client array size full\n", stderr);
 					exit(1);
 				}
-				fputs("Client connesso.\n", stdout);
+				inet_ntop(AF_INET, &s_cliaddr.sin_addr, iplog[i], sizeof(iplog[i]));	/* memorizza l'indirizzo del client per il logging */
+				portlog[i] = ntohs(s_cliaddr.sin_port);	/* memorizza la porta del client per il logging */
+				fprintf(stdout, "(%s:%d) Client connesso.\n", iplog[i], portlog[i]);
 				/* inserisce connfd tra i descrittori da controllare ed aggiorna maxd */
 				FD_SET(connfd, &active_fd_set);
 				if (connfd > maxd)
@@ -161,7 +165,7 @@ int main(int argc, char **argv) {
 						elaboraRichiesta(masterfd, sockfd, &richiesta);
 					else {
 						/* chiusura connessione da parte del client */
-						fputs("Connessione chiusa da client.\n", stdout);
+						fprintf(stdout, "(%s:%d) Connessione chiusa da client.\n", iplog[i], portlog[i]);
 						FD_CLR(sockfd, &active_fd_set); /* rimuove sockfd dalla lista dei socket da controllare */
 						client[i] = -1; /* cancella sockfd da client */
 					}
