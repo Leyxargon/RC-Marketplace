@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
 	char buf[BUFSIZE];
 	pthread_t C, N;
 	pthread_args args;
+	mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 
 	/* LETTURA INFORMAZIONI */
 	dbf = Fopen("db.txt", "r");
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
 			Write(connfd, "0", 1);
 			fputs("Connessione con serverN.\n", stdout);
 			if (pthread_create(&N, NULL, serverN, (void *) &args) < 0) {
-				perror("pthread_create");
+				fputs("pthread_create: impossibile creare il thread.\n", stderr);
 				exit(1);
 			}
 		}
@@ -90,7 +91,7 @@ int main(int argc, char **argv) {
 			Write(connfd, "0", 1);
 			fputs("Connessione con serverC.\n", stdout);
 			if (pthread_create(&C, NULL, serverC, (void *) &args) < 0) {
-				perror("pthread_create");
+				fputs("pthread_create: impossibile creare il thread.\n", stderr);
 				exit(1);
 			}
 		}
@@ -100,6 +101,5 @@ int main(int argc, char **argv) {
 			close(connfd);
 		}
 	}
-
 	exit(0);
 }

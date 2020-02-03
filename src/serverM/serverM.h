@@ -17,6 +17,8 @@ typedef struct PTHREAD_ARGS {
 	Utente *listaUtenti;
 }pthread_args;
 
+pthread_mutex_t mutex;
+
 void *serverC(void *connfd);
 void *serverN(void *connfd);
 void printUsage(char *prog);

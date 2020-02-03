@@ -9,13 +9,19 @@ void *serverC(void *args) {
 		if (!Read(connfd, &richiesta, sizeof(richiesta))) {
 			switch(richiesta.rich) {
 				case '1':	/* Visualizza l'elenco dei negozi virtuali */
+					pthread_mutex_lock(&mutex);
 					visualizzaNegozi_C(connfd, listaUtenti, richiesta);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '2':	/* Visualizza i prodotti di un negozio */
+					pthread_mutex_lock(&mutex);
 					visualizzaProdottiNeg_C(connfd, listaUtenti, richiesta);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '3':	/* Cerca un prodotto in un negozio */
+					pthread_mutex_lock(&mutex);
 					cercaProdotto(connfd, listaUtenti, richiesta);
+					pthread_mutex_unlock(&mutex);
 					break;
 				default:
 					fputs("Richiesta non valida.\n", stderr);
@@ -40,16 +46,24 @@ void *serverN(void *args) {
 		if (!Read(connfd, &richiesta, sizeof(richiesta))) {
 			switch (richiesta.rich) {
 				case '1':	/* Crea un nuovo negozio virtuale */
+					pthread_mutex_lock(&mutex);
 					creaNegozio_N(connfd, listaUtenti, richiesta, dbf);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '2':	/* Elimina un negozio virtuale */
+					pthread_mutex_lock(&mutex);
 					rimuoviNegozio_N(connfd, listaUtenti, richiesta, dbf);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '3':	/* Aggiungi un prodotto in un negozio virtuale */
+					pthread_mutex_lock(&mutex);
 					creaProdotto_N(connfd, listaUtenti, richiesta, dbf);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '4':	/* Rimuovi un prodotto in un negozio virtuale */
+					pthread_mutex_lock(&mutex);
 					rimuoviProdotto_N(connfd, listaUtenti, richiesta, dbf);
+					pthread_mutex_unlock(&mutex);
 					break;
 				case '5':	/* Visualizza i negozi virtuali di un negoziante */
 					visualizzaNegozi_N(connfd, listaUtenti, richiesta, dbf);
