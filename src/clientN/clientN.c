@@ -26,7 +26,7 @@ void signup(int sfd) {
 		fgets(buf, sizeof(buf), stdin);
 		buf[strcspn(buf, "\r\n")] = '\0';
 		strcpy(signup.pass, buf);
-		Write(sfd, &pacchetto, sizeof(pacchetto));	/* invio pacchetto di richiesta (tipo 5) */
+		Write(sfd, &pacchetto, sizeof(pacchetto));	/* invio pacchetto di richiesta */
 		Read(sfd, &buf, 1);		/* lettura esito */
 		Write(sfd, &signup, sizeof(signup));		/* invio pacchetto di login */
 		fputs("Attendere, prego...\n", stdout);
@@ -64,7 +64,7 @@ void login(char *usr_login, int sfd) {
 		fgets(buf, sizeof(buf), stdin);
 		buf[strcspn(buf, "\r\n")] = '\0';
 		strcpy(login.pass, buf);
-		Write(sfd, &pacchetto, sizeof(pacchetto));	/* invio pacchetto di richiesta (tipo 5) */
+		Write(sfd, &pacchetto, sizeof(pacchetto));	/* invio pacchetto di richiesta */
 		Read(sfd, &buf, 1);		/* lettura esito */
 		Write(sfd, &login, sizeof(login));		/* invio pacchetto di login */
 		fputs("Accesso in corso...\n", stdout);
