@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 	struct hostent *c_cliaddr;
 	char *addr, **alias;
 	c_cliaddr = GetHostByName(address);
-    alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
+ 	alias = c_cliaddr -> h_addr_list;	/* legge gli indirizzi IP dall'eventuale indirizzo simbolico */
 	addr = (char *) inet_ntop(c_cliaddr -> h_addrtype, *alias, buf, sizeof(buf));
 	Inet_pton(AF_INET, addr, &c_servaddr.sin_addr);
 
@@ -112,7 +112,6 @@ int main(int argc, char **argv) {
 
 	FD_ZERO(&active_fd_set); /* inizializzazione a zero l'insieme dei descrittori */
 	FD_SET(listenfd, &active_fd_set); /* aggiunta del descrittore di ascolto */
-	FD_SET(masterfd, &active_fd_set); /* aggiunta del descrittore associato al serverM */
 
 	/* esecuzione server */
 	while (1) {
