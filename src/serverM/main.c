@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	/* 	servaddr: informazioni indirizzo server
 	 *	cliaddr: informazioni indirizzo client connesso
 	 */
-	int len = sizeof(cliaddr);;
+	int len = sizeof(cliaddr);
 
 	/* VARIABILI LIVELLO APPLICAZIONE */
 	Utente *listaUtenti = NULL;
